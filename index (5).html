@@ -1,0 +1,2112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Company Architect</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>"><rect width='100' height='100' rx='16' fill='%231e1e2c'/><rect x='20' y='40' width='60' height='50' rx='4' fill='%232c5ea8'/><rect x='30' y='20' width='40' height='35' rx='4' fill='%233a6ec8'/><rect x='42' y='55' width='16' height='20' rx='2' fill='%23ffd700'/><rect x='25' y='45' width='10' height='10' rx='1' fill='%23fff' opacity='0.6'/><rect x='65' y='45' width='10' height='10' rx='1' fill='%23fff' opacity='0.6'/><rect x='25' y='60' width='10' height='10' rx='1' fill='%23fff' opacity='0.6'/><rect x='65' y='60' width='10' height='10' rx='1' fill='%23fff' opacity='0.6'/></svg>">
+<meta name="description" content="Build a company, manage staff, launch products and compete on the leaderboard.">
+<meta name="theme-color" content="#13131a">
+<meta property="og:title" content="Company Architect">
+<meta property="og:description" content="Build a company, manage staff, launch products and compete on the leaderboard.">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #13131a; color: #e0e0e0; font-family: Arial, sans-serif; min-height: 100vh; }
+
+.screen { display: none; padding: 24px 16px; max-width: 960px; margin: 0 auto; }
+.screen.active { display: block; }
+
+h1 { color: #ffd700; font-size: 26px; text-align: center; margin-bottom: 6px; }
+h2 { color: #ffd700; font-size: 18px; margin-bottom: 14px; }
+h3 { color: #ccc; font-size: 15px; margin-bottom: 8px; }
+
+.subtitle { color: #888; text-align: center; margin-bottom: 18px; font-size: 14px; }
+
+.btn { padding: 9px 18px; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; color: #fff; transition: opacity 0.15s; }
+.btn:hover { opacity: 0.82; }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-green { background: #1a9050; }
+.btn-blue { background: #2c5ea8; }
+.btn-orange { background: #b84800; }
+.btn-grey { background: #484854; }
+.btn-red { background: #942020; }
+.btn-gold { background: #9a7800; }
+.btn-purple { background: #6030a0; }
+.btn-full { width: 100%; margin-top: 8px; padding: 11px; font-size: 15px; }
+
+.type-btn-row { display: flex; gap: 10px; justify-content: center; margin: 14px 0; flex-wrap: wrap; }
+.type-btn { padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; color: #fff; border: 3px solid transparent; }
+.type-btn.tech { background: #1560a8; }
+.type-btn.clothing { background: #7828a8; }
+.type-btn.food { background: #b84000; }
+.type-btn.selected { border-color: #ffd700; }
+
+input[type="text"], input[type="number"], input[type="password"], input[type="email"] { width: 100%; padding: 9px 12px; background: #22222e; border: 1px solid #444; border-radius: 6px; color: #fff; font-size: 14px; margin: 6px 0; }
+select { padding: 9px 12px; background: #22222e; border: 1px solid #444; border-radius: 6px; color: #fff; font-size: 14px; width: 100%; margin: 6px 0; }
+label { font-size: 13px; color: #aaa; display: block; margin-top: 8px; }
+
+.error { color: #f55; font-size: 13px; margin-top: 6px; text-align: center; }
+.success { color: #5d5; font-size: 13px; margin-top: 6px; }
+
+/* Top bar */
+.top-bar { background: #1c1c28; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+.top-bar-left { display: flex; flex-wrap: wrap; gap: 14px; }
+.stat { display: flex; flex-direction: column; }
+.stat-label { color: #888; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-value { color: #fff; font-weight: bold; font-size: 15px; }
+.stat-value.money { color: #ffd700; }
+.stat-value.rep-high { color: #5d5; }
+.stat-value.rep-med { color: #fd5; }
+.stat-value.rep-low { color: #f77; }
+
+/* Progress bar */
+.progress-wrap { background: #22222e; border-radius: 20px; height: 8px; margin-bottom: 16px; overflow: hidden; }
+.progress-bar { height: 8px; border-radius: 20px; background: linear-gradient(90deg, #1a9050, #ffd700); transition: width 0.4s; }
+
+/* Menu grid */
+.menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.menu-btn { padding: 16px 12px; border-radius: 8px; background: #1e3060; color: #fff; font-size: 14px; font-weight: bold; border: none; cursor: pointer; text-align: center; transition: background 0.15s; }
+.menu-btn:hover { background: #2a4070; }
+.menu-btn.danger { background: #6a1a1a; }
+.menu-btn.danger:hover { background: #8a2a2a; }
+.menu-btn.end { background: #7a3800; }
+.menu-btn.end:hover { background: #9a4800; }
+.menu-btn.prestige { background: #6030a0; }
+.menu-btn.prestige:hover { background: #7040b0; }
+
+/* Cards */
+.card { background: #1e1e2c; border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; border: 1px solid #2a2a3c; }
+.card-info { font-size: 13px; color: #ccc; line-height: 1.7; flex: 1; min-width: 200px; }
+.card-info strong { color: #fff; font-size: 14px; }
+.card-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.badge { background: #ffd700; color: #222; font-size: 11px; font-weight: bold; padding: 2px 7px; border-radius: 4px; }
+.badge-red { background: #c03030; color: #fff; }
+.badge-blue { background: #1a60c0; color: #fff; }
+.badge-green { background: #1a8040; color: #fff; }
+.badge-purple { background: #6030a0; color: #fff; }
+
+/* Bulk buttons */
+.bulk-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.bulk-btn { padding: 7px 14px; border-radius: 5px; background: #2a3a5a; color: #aad; border: 1px solid #3a4a6a; font-size: 13px; cursor: pointer; font-weight: bold; }
+.bulk-btn:hover { background: #3a4a6a; }
+.bulk-btn.active { background: #2c5ea8; border-color: #4a7ad0; color: #fff; }
+
+/* Summary */
+.summary-box { background: #1e1e2c; border-radius: 8px; padding: 14px; margin-bottom: 14px; font-size: 13px; border: 1px solid #2a2a3c; }
+.summary-row { display: flex; justify-content: space-between; padding: 3px 0; }
+.summary-row.pos { color: #5d5; }
+.summary-row.neg { color: #f77; }
+.summary-row.total { color: #ffd700; font-weight: bold; font-size: 14px; border-top: 1px solid #444; padding-top: 6px; margin-top: 4px; }
+.section-head { color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin: 10px 0 4px; }
+
+/* Event banner */
+.event-banner { border-radius: 8px; padding: 12px 16px; margin-bottom: 14px; font-size: 14px; line-height: 1.6; }
+.event-banner.good { background: #0e2e1a; border: 1px solid #1a6030; color: #7ddc7d; }
+.event-banner.bad { background: #2e0e0e; border: 1px solid #601a1a; color: #dd7d7d; }
+.event-banner.neutral { background: #1a1a2e; border: 1px solid #2a2a6a; color: #8888dd; }
+
+/* Competitor panel */
+.rival-panel { background: #1a1a28; border: 1px solid #3a2a5a; border-radius: 8px; padding: 14px; margin-bottom: 14px; }
+.rival-panel h3 { color: #c080ff; margin-bottom: 10px; }
+.rival-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.rival-stat { font-size: 13px; color: #aaa; }
+.rival-stat span { color: #ddd; font-weight: bold; }
+
+/* Market share bar */
+.market-bar-wrap { margin: 8px 0; }
+.market-bar { height: 10px; border-radius: 5px; overflow: hidden; display: flex; }
+.market-bar-you { background: #2c5ea8; }
+.market-bar-rival { background: #6030a0; }
+.market-bar-other { background: #333; }
+.market-labels { display: flex; gap: 14px; font-size: 11px; margin-top: 4px; }
+.market-labels span { display: flex; align-items: center; gap: 4px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+/* Loan panel */
+.loan-active { background: #2e1a0a; border: 1px solid #6a3a0a; border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 13px; color: #f0a060; }
+
+/* Prestige stars */
+.prestige-stars { text-align: center; font-size: 22px; margin-bottom: 8px; letter-spacing: 4px; }
+
+/* Prod rows */
+.prod-row { background: #1e1e2c; border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; border: 1px solid #2a2a3c; }
+.prod-row h3 { color: #ffd700; margin-bottom: 6px; font-size: 14px; }
+.prod-inputs { display: flex; gap: 10px; flex-wrap: wrap; }
+.prod-inputs > div { flex: 1; min-width: 130px; }
+
+.trend-badge { font-size: 11px; padding: 2px 7px; border-radius: 4px; margin-left: 6px; }
+.trend-up { background: #1a4020; color: #6ddc6d; }
+.trend-down { background: #3a1010; color: #dc6d6d; }
+
+/* Tabs */
+.tab-bar { display: flex; gap: 4px; margin-bottom: 14px; flex-wrap: wrap; }
+.tab { padding: 7px 14px; border-radius: 6px 6px 0 0; font-size: 13px; font-weight: bold; cursor: pointer; background: #1e1e2c; color: #888; border: 1px solid #2a2a3c; border-bottom: none; }
+.tab.active { background: #22222e; color: #ffd700; border-color: #3a3a50; }
+
+.tab-content { background: #22222e; border-radius: 0 8px 8px 8px; padding: 14px; border: 1px solid #3a3a50; margin-bottom: 14px; }
+
+/* Game over */
+.gameover-box { text-align: center; padding: 30px 16px; }
+.gameover-box h1 { font-size: 42px; margin-bottom: 12px; }
+.gameover-stats { color: #aad4ff; font-size: 15px; line-height: 2; margin: 16px 0; }
+
+/* ✗tification */
+#notification { position: fixed; top: 16px; right: 16px; background: #1a3a2a; border: 1px solid #2a6a3a; border-radius: 8px; padding: 12px 18px; font-size: 14px; color: #7ddc7d; z-index: 999; display: none; max-width: 280px; }
+#notification.bad { background: #3a1a1a; border-color: #6a2a2a; color: #dd7d7d; }
+
+/* Auth screen */
+.auth-box { max-width: 420px; margin: 0 auto; }
+.auth-divider { text-align: center; color: #555; margin: 14px 0; font-size: 13px; position: relative; }
+.auth-divider::before, .auth-divider::after { content:''; position:absolute; top:50%; width:42%; height:1px; background:#333; }
+.auth-divider::before { left:0; } .auth-divider::after { right:0; }
+.user-bar { background: #1c1c28; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
+.user-bar .user-name { color: #ffd700; font-weight: bold; }
+.leaderboard-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #1e1e2c; border-radius: 6px; margin-bottom: 6px; font-size: 14px; }
+.leaderboard-row.you { border: 1px solid #ffd700; }
+.leaderboard-rank { color: #888; width: 28px; font-weight: bold; }
+.leaderboard-name { flex: 1; }
+.leaderboard-score { color: #ffd700; font-weight: bold; }
+
+
+/* Auth screen */
+.auth-box { max-width: 420px; margin: 60px auto; background: #1e1e2c; border-radius: 12px; padding: 32px; border: 1px solid #2a2a3c; }
+.auth-box h1 { font-size: 22px; margin-bottom: 6px; }
+.auth-divider { display: flex; align-items: center; gap: 10px; margin: 16px 0; color: #555; font-size: 12px; }
+.auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: #333; }
+.google-btn { width: 100%; padding: 11px; background: #fff; color: #333; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 8px; }
+.google-btn:hover { background: #f0f0f0; }
+.auth-tabs { display: flex; margin-bottom: 16px; border-bottom: 1px solid #333; }
+.auth-tab { flex: 1; padding: 8px; text-align: center; cursor: pointer; font-size: 14px; color: #888; border-bottom: 2px solid transparent; }
+.auth-tab.active { color: #ffd700; border-bottom-color: #ffd700; }
+
+/* User bar */
+.user-bar { background: #1c1c28; border-radius: 8px; padding: 8px 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
+.user-bar-name { color: #aaa; }
+.user-bar-name span { color: #fff; font-weight: bold; }
+
+/* Leaderboard */
+.lb-row { display: flex; align-items: center; padding: 10px 14px; background: #1e1e2c; border-radius: 8px; margin-bottom: 6px; border: 1px solid #2a2a3c; font-size: 14px; }
+.lb-rank { color: #ffd700; font-weight: bold; width: 32px; font-size: 16px; }
+.lb-name { flex: 1; color: #fff; }
+.lb-detail { color: #aaa; font-size: 13px; text-align: right; }
+.lb-you { border-color: #ffd700; background: #1e1e10; }
+
+/* Mobile improvements */
+@media (max-width: 600px) {
+ .screen { padding: 16px 12px; }
+ h1 { font-size: 22px; }
+ h2 { font-size: 16px; }
+ .menu-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+ .menu-btn { padding: 14px 8px; font-size: 13px; }
+ .btn { padding: 10px 14px; font-size: 14px; }
+ .btn-full { padding: 13px; font-size: 15px; }
+ .top-bar { padding: 10px 12px; gap: 10px; }
+ .stat-value { font-size: 14px; }
+ .card { padding: 10px 12px; }
+ .prod-inputs { flex-direction: column; }
+ .bulk-row { flex-wrap: wrap; }
+}
+</style>
+<!-- Firebase -->
+
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+<script>
+
+// Immediately hide all screens except start on load
+// Prevents flash of menu screen before JS runs
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.screen').forEach(s => {
+    if (s.id !== 'screen-start') s.classList.remove('active');
+  });
+});
+</script>
+<div id="notification"></div>
+
+<!-- START SCREEN -->
+<div id="screen-start" class="screen active">
+ <div style="text-align:center; font-size:48px; margin-bottom:4px;">🏢</div>
+  <!-- svg removed --><svg style="display:none" width="64" height="64" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+ <rect width="100" height="100" rx="16" fill="#1e1e2c"/>
+ <rect x="20" y="40" width="60" height="50" rx="4" fill="#2c5ea8"/>
+ <rect x="30" y="20" width="40" height="35" rx="4" fill="#3a6ec8"/>
+ <rect x="42" y="55" width="16" height="20" rx="2" fill="#ffd700"/>
+ <rect x="25" y="45" width="10" height="10" rx="1" fill="#fff" opacity="0.6"/>
+ <rect x="65" y="45" width="10" height="10" rx="1" fill="#fff" opacity="0.6"/>
+ <rect x="25" y="60" width="10" height="10" rx="1" fill="#fff" opacity="0.6"/>
+ <rect x="65" y="60" width="10" height="10" rx="1" fill="#fff" opacity="0.6"/>
+</svg>
+ <h1>Company Architect</h1>
+ <p class="subtitle">Build your empire. Prestige at £1M and keep growing.</p>
+ <div class="type-btn-row">
+ <button class="type-btn tech" onclick="selectType('tech',this)">💻 Tech</button>
+ <button class="type-btn clothing" onclick="selectType('clothing',this)">👕 Clothing</button>
+ <button class="type-btn food" onclick="selectType('food',this)">🍔 Food</button>
+ </div>
+ <div style="max-width:420px; margin:0 auto;">
+ <div style="background:#1e1e2c; border-radius:8px; padding:14px; margin-bottom:12px; font-size:13px; color:#aaa; line-height:1.7;" id="type-info">
+ Select a business type to see its stats.
+ </div>
+ <label>Company name:</label>
+ <input type="text" id="company-name" placeholder="Enter your company name">
+ <div id="start-error" class="error"></div>
+ <button class="btn btn-green btn-full" onclick="startGame()">Start Game →</button>
+ <button class="btn btn-blue btn-full" onclick="startGameWithTutorial()">New Player? Start with Tutorial →</button>
+  </div>
+</div>
+
+<!-- MENU SCREEN -->
+<div id="screen-menu" class="screen">
+ <!-- Static settings bar - always visible -->
+ <div id="static-settings-bar" style="display:flex;justify-content:flex-end;margin-bottom:8px;">
+   <button class="btn btn-grey" style="padding:6px 14px;font-size:13px;" onclick="showScreen('settings')">⚙ Settings</button>
+ </div>
+ <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+ <div>
+ <div style="font-size:12px; color:#888;">Turn <span id="turn-num">1</span></div>
+ <h1 style="text-align:left; margin-bottom:0;" id="menu-name">Company</h1>
+ </div>
+ <div style="text-align:right;">
+ <div style="font-size:11px; color:#888;">Progress to £1M</div>
+ <div style="font-size:13px; color:#ffd700;" id="progress-text">0%</div>
+ </div>
+ </div>
+ <div class="progress-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+ <div class="top-bar" id="top-bar"></div>
+ <div id="event-area"></div>
+ <div id="loan-area"></div>
+ <div class="menu-grid">
+ <button class="menu-btn" onclick="showScreen('launch')">🚀 Launch Product</button>
+ <button class="menu-btn" onclick="showScreen('hire')">👥 Hire Employees</button>
+ <button class="menu-btn" onclick="showScreen('facility')">🏭 Facilities</button>
+ <button class="menu-btn" onclick="showScreen('invest')">📈 Invest / R&D</button>
+ <button class="menu-btn" onclick="showScreen('finance')">🏦 Finance</button>
+ <button class="menu-btn" onclick="showScreen('rival')">⚔ Rival</button>
+ <button class="menu-btn" onclick="showScreen('history')">📊 History</button>
+ <button class="menu-btn" onclick="showScreen('tips')">💡 Tips</button>
+ <button class="menu-btn" onclick="showScreen('tutorial')">📖 How to Play</button>
+ <button class="menu-btn end" onclick="showScreen('endturn')">⏭ End Turn</button>
+ <button class="menu-btn" onclick="showScreen('leaderboard'); loadLeaderboard()">🏆 Leaderboard</button>
+ <button class="menu-btn prestige" id="prestige-btn" onclick="showScreen('prestige')" style="display:none;">⭐ Prestige</button>
+ </div>
+</div>
+
+<!-- LAUNCH SCREEN -->
+<div id="screen-launch" class="screen">
+ <h2>🚀 Launch Product</h2>
+ <div id="launch-content"></div>
+ <button class="btn btn-grey btn-full" onclick="goToMenu()">← Back</button>
+</div>
+
+<!-- HIRE SCREEN -->
+<div id="screen-hire" class="screen">
+ <h2>👥 Hire Employees</h2>
+ <div id="hire-content"></div>
+ <button class="btn btn-grey btn-full" onclick="goToMenu()">← Back</button>
+</div>
+
+<!-- FACILITY SCREEN -->
+<div id="screen-facility" class="screen">
+ <h2>🏭 Facilities</h2>
+ <div class="tab-bar">
+ <div class="tab active" onclick="facilityTab('buy',this)">Buy</div>
+ <div class="tab" onclick="facilityTab('upgrade',this)">Upgrade</div>
+ </div>
+ <div id="facility-content"></div>
+ <button class="btn btn-grey btn-full" onclick="goToMenu()">← Back</button>
+</div>
+
+<!-- INVEST SCREEN -->
+<div id="screen-invest" class="screen">
+ <h2>📈 Invest / R&D</h2>
+ <div class="tab-bar">
+ <div class="tab active" onclick="investTab('investments',this)">Investments</div>
+ <div class="tab" onclick="investTab('rd',this)">R&D</div>
+ </div>
+ <div id="invest-content"></div>
+ <button class="btn btn-grey btn-full" onclick="goToMenu()">← Back</button>
+</div>
+
+<!-- FINANCE SCREEN -->
+<div id="screen-finance" class="screen">
+ <h2>🏦 Finance</h2>
+ <div id="finance-content"></div>
+ <button class="btn btn-grey btn-full" onclick="goToMenu()">← Back</button>
+</div>
+
+<!-- RIVAL SCREEN -->
+<div id="screen-rival" class="screen">
+ <h2>⚔ Rival Company</h2>
+ <div id="rival-content"></div>
+ <button class="btn btn-grey btn-full" onclick="goToMenu()">← Back</button>
+</div>
+
+<!-- END TURN SCREEN -->
+<div id="screen-endturn" class="screen">
+ <h2 id="endturn-title">Set Production</h2>
+ <div id="endturn-content"></div>
+</div>
+
+<!-- PRESTIGE SCREEN -->
+<div id="screen-prestige" class="screen">
+ <h2>⭐ Prestige</h2>
+ <div id="prestige-content"></div>
+ <button class="btn btn-grey btn-full" onclick="goToMenu()">← Back</button>
+</div>
+
+<!-- GAME OVER SCREEN -->
+<div id="screen-gameover" class="screen">
+ <div id="gameover-content"></div>
+</div>
+
+<script>
+// Global auth state - declared here so available immediately
+let currentUser = null;
+let isGuest = false;
+let authMode = 'login';
+let tutorialStep = 0;
+
+// ============================================================
+// CONSTANTS
+// ============================================================
+const BUSINESS_DEFS = {
+ tech: {
+ label: 'Tech Company', startMoney: 80000, salaryMult: 1.2, investLuck: 'low',
+ desc: 'High salaries, low investment luck. Big margins on products.',
+ products: [
+ {name:'Smartphone',cost:800,market:1299},{name:'Laptop',cost:1100,market:1799},
+ {name:'Smart Watch',cost:200,market:449},{name:'Gaming Console',cost:400,market:649},
+ {name:'VR Headset',cost:900,market:1499}
+ ]
+ },
+ clothing: {
+ label: 'Clothing Brand', startMoney: 90000, salaryMult: 1.0, investLuck: 'medium',
+ desc: 'Balanced stats. Higher base popularity on all products.',
+ products: [
+ {name:'T-Shirt',cost:15,market:45},{name:'Jeans',cost:40,market:60},
+ {name:'Sweatpants',cost:30,market:60},{name:'Hoodie',cost:35,market:90},
+ {name:'Coat',cost:80,market:200}
+ ]
+ },
+ food: {
+ label: 'Fast Food Chain', startMoney: 100000, salaryMult: 0.8, investLuck: 'high',
+ desc: 'Cheapest staff. High investment luck. You create custom menu items.',
+ products: []
+ }
+};
+
+const INVESTMENT_DEFS = [
+ {name:'Retail Chain', cost:10000, chance:0.65, reward:2.0, turns:3},
+ {name:'Energy Company', cost:15000, chance:0.55, reward:2.8, turns:4},
+ {name:'Game Studio', cost:12000, chance:0.6, reward:2.4, turns:3},
+ {name:'Transport Company',cost:8000, chance:0.75, reward:1.8, turns:2}
+];
+
+const RD_UPGRADES = [
+ {id:'pop_boost', name:'Marketing Dept', cost:20000, desc:'+10 popularity to all products permanently.', purchased:false},
+ {id:'salary_cut', name:'HR Optimisation', cost:25000, desc:'Reduce all salary costs by 15%.', purchased:false},
+ {id:'prod_cut', name:'Supply Chain Deal', cost:30000, desc:'Reduce all production costs by 20%.', purchased:false},
+ {id:'cap_boost', name:'Automation Systems', cost:40000, desc:'+30% sales capacity across all facilities.', purchased:false},
+ {id:'rep_boost', name:'PR Campaign', cost:15000, desc:'Instantly gain 20 reputation points.', purchased:false}
+];
+
+const RANDOM_EVENTS = [
+ {type:'good', text:'📰 Your product went viral on social media! All product popularity +10 this turn.', effect:'viral'},
+ {type:'good', text:'🌟 Strong economic growth! Revenue multiplier +20% this turn.', effect:'boom'},
+ {type:'good', text:'🏆 Industry award won! Reputation +15.', effect:'award'},
+ {type:'good', text:'💡 Talented recruits flood the market. Next hire costs 10% less.', effect:'cheapHire'},
+ {type:'bad', text:'🔥 Warehouse fire! Lost one facility level.', effect:'fire'},
+ {type:'bad', text:'📉 Recession hits! All sales reduced 30% this turn.', effect:'recession'},
+ {type:'bad', text:'😤 Staff walkout! Productivity halved this turn.', effect:'walkout'},
+ {type:'bad', text:'💸 Supplier bankruptcy! Production costs +25% this turn.', effect:'supplier'},
+ {type:'bad', text:'📰 Bad press! Reputation -20.', effect:'badpress'},
+ {type:'neutral',text:'🏛 New tax regulation. Pay £5,000 compliance fee.', effect:'tax'},
+ {type:'neutral',text:'🤝 Trade deal reached. Investment success chances +10% this turn.', effect:'tradedeal'},
+ {type:'neutral',text:'🏙 Local competitor undercuts you. Rival gains +5% market share.', effect:'rivalBoost'}
+];
+
+const SEASONS = ['Spring','Summer','Autumn','Winter'];
+const SEASON_EFFECTS = {
+ Spring: {food:1.1, clothing:1.15, tech:1.0},
+ Summer: {food:1.2, clothing:0.9, tech:1.05},
+ Autumn: {food:1.0, clothing:1.2, tech:1.1},
+ Winter: {food:0.9, clothing:1.3, tech:1.15}
+};
+
+// ============================================================
+// GAME STATE
+// ============================================================
+let G = {};
+let selectedBusinessType = '';
+let currentFacilityTab = 'buy';
+let currentInvestTab = 'investments';
+let notifTimer = null;
+
+function newGame() {
+ G = {
+ turn: 1,
+ money: 0,
+ businessType: '',
+ companyName: '',
+ prestige: 0,
+ prestigeMultiplier: 1.0,
+ prestigeTarget: 1000000,
+ reputation: 60,
+ facilities: [],
+ availableProducts: [],
+ activeProducts: [],
+ investments: [],
+ rdPurchased: [],
+ loan: null,
+ pendingEvent: null,
+ eventEffect: null,
+ marketShare: 40,
+ rival: {},
+ seasonIndex: 0,
+ rdUpgrades: RD_UPGRADES.map(r => ({...r, purchased: false})),
+ history: []
+ };
+}
+
+function initRival() {
+ G.rival = {
+ name: rivalName(),
+ money: G.money * 0.9,
+ employees: 3,
+ facilities: 1,
+ products: 2,
+ marketShare: 35,
+ growth: 0.04
+ };
+}
+
+function rivalName() {
+ const names = ['Apex Corp','Pinnacle Ltd','Nexus Group','Vertex Inc','Orbit Co','Summit PLC'];
+ return names[Math.floor(Math.random() * names.length)];
+}
+
+// ============================================================
+// START GAME
+// ============================================================
+const TYPE_INFO = {
+ tech: '💻 <strong>Tech Company</strong><br>Starting money: £80,000 | Salaries: high | Investment luck: low<br>Big product margins. Harder early game.',
+ clothing: '👕 <strong>Clothing Brand</strong><br>Starting money: £90,000 | Salaries: medium | Investment luck: medium<br>Balanced all-rounder. Products have bonus popularity.',
+ food: '🍔 <strong>Fast Food Chain</strong><br>Starting money: £100,000 | Salaries: low | Investment luck: high<br>Cheapest staff. You create custom menu items freely.'
+};
+
+function selectType(type, btn) {
+ selectedBusinessType = type;
+ document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
+ btn.classList.add('selected');
+ document.getElementById('type-info').innerHTML = TYPE_INFO[type];
+}
+
+function startGame() {
+ const name = document.getElementById('company-name').value.trim();
+ const err = document.getElementById('start-error');
+ if (!selectedBusinessType) { err.textContent = 'Please select a business type.'; return; }
+ if (!name) { err.textContent = 'Please enter a company name.'; return; }
+
+ newGame();
+ G.businessType = selectedBusinessType;
+ G.companyName = name;
+ const def = BUSINESS_DEFS[G.businessType];
+ G.money = def.startMoney * G.prestigeMultiplier;
+
+ G.facilities.push(createFacility()); // first facility is free
+
+ if (G.businessType !== 'food') {
+ G.availableProducts = def.products.map(p => ({
+ ...p, launched: false, age: 0,
+ popularity: Math.min(100, randomPop(false, G.businessType === 'clothing') + 15),
+ unitsMade: 0, chosenPrice: p.market, lastSold: 0, lastRevenue: 0
+ }));
+ }
+
+ G.investments = INVESTMENT_DEFS.map(i => ({...i, active: false, turnsLeft: 0, lastResult: 0, lastWin: false}));
+ initRival();
+ goToMenu();
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function randomPop(isFood, isClothing) {
+ let p = Math.floor(Math.random() * 61) + 40;
+ if (isFood) p += 20;
+ if (isClothing) p += 10;
+ if (G.rdPurchased && G.rdPurchased.includes('pop_boost')) p += 10;
+ return Math.min(p, 100);
+}
+
+function foodCost(type, luxury) {
+ const base = {main:{cheap:6,normal:8,luxury:10},side:{cheap:1,normal:2,luxury:3},starter:{cheap:2,normal:3,luxury:5},dessert:{cheap:1,normal:2,luxury:4}};
+ let c = base[type][luxury];
+ if (G.rdPurchased && G.rdPurchased.includes('prod_cut')) c = Math.floor(c * 0.8);
+ return c;
+}
+
+function createEmployee() {
+ const salMult = BUSINESS_DEFS[G.businessType].salaryMult;
+ const rdCut = G.rdPurchased && G.rdPurchased.includes('salary_cut') ? 0.85 : 1.0;
+ const happiness = Math.floor(Math.random() * 51) + 50;
+ const skill = Math.floor(Math.random() * 51) + 50;
+ let salary = (100 + skill * 3) * salMult * rdCut;
+ const productivity = skill * happiness / 100;
+ return { happiness, skill, salary, productivity };
+}
+
+function createFacility() {
+ return { level: 1, maxEmployees: 10, employees: [] };
+}
+
+function getAvgProductivity() {
+ let t = 0, c = 0;
+ for (const f of G.facilities) for (const e of f.employees) { t += e.productivity; c++; }
+ if (G.eventEffect === 'walkout') return c === 0 ? 0 : (t / c) * 0.75;
+ return c === 0 ? 0 : t / c;
+}
+
+function getAvgSkill() {
+ let t = 0, c = 0;
+ for (const f of G.facilities) for (const e of f.employees) { t += e.skill; c++; }
+ return c === 0 ? 0 : t / c;
+}
+
+function getTotalSalesCapacity() {
+ const avgProd = getAvgProductivity();
+ let total = 0;
+ for (const f of G.facilities) {
+ const lm = 1.0 + f.level / 10.0;
+ total += Math.floor(f.employees.length * avgProd * lm * 1.5);
+ }
+ if (G.rdPurchased && G.rdPurchased.includes('cap_boost')) total = Math.floor(total * 1.3);
+ return total;
+}
+
+function getTotalSalaries() {
+ let t = 0;
+ for (const f of G.facilities) for (const e of f.employees) t += e.salary;
+ return Math.floor(t);
+}
+
+function getTotalEmployees() {
+ return G.facilities.reduce((s, f) => s + f.employees.length, 0);
+}
+
+function getPopMult() {
+ let m = G.reputation / 100;
+ if (getAvgSkill() >= 86) m *= 1.15;
+ else if (getAvgSkill() >= 66) m *= 1.1;
+ if (G.eventEffect === 'viral') m *= 1.2;
+ return m;
+}
+
+function getSeason() { return SEASONS[G.seasonIndex % 4]; }
+
+function getSeasonMult() {
+ return SEASON_EFFECTS[getSeason()][G.businessType] || 1.0;
+}
+
+function launchedProducts() {
+ return G.businessType === 'food'
+ ? G.activeProducts
+ : G.availableProducts.filter(p => p.launched);
+}
+
+// ============================================================
+// REVENUE
+// ============================================================
+function calcProductRevenue(p) {
+ const capacity = getTotalSalesCapacity();
+ const popMult = getPopMult();
+ let boostedPop = Math.min(100, p.popularity * popMult);
+ const demand = boostedPop / 100;
+ let priceAdj = Math.min(2, Math.max(0.3, p.market / p.chosenPrice));
+ let baseSellRate = Math.min(1, Math.max(0, demand * priceAdj));
+
+ // Add ±15% random variance — skill pushes toward top of range
+ const variance = (Math.random() * 0.3) - 0.15; // -15% to +15%
+ const repBonus = (G.reputation - 50) / 500; // rep 50=0, rep100=+0.1, rep0=-0.1
+ let sellRate = Math.min(1, Math.max(0.1, baseSellRate + variance + repBonus));
+
+ let sold = Math.min(p.unitsMade, Math.floor(p.unitsMade * sellRate));
+ sold = Math.min(sold, capacity);
+ if (G.eventEffect === 'recession') sold = Math.floor(sold * 0.85);
+ sold = Math.floor(sold * getSeasonMult());
+ if (G.eventEffect === 'boom') sold = Math.floor(sold * 1.2);
+ if (G.eventEffect === 'bulkOrder') sold = Math.floor(sold * 1.5);
+ if (G.eventEffect === 'holiday') sold = Math.floor(sold * 1.25);
+
+ let rev = sold * p.chosenPrice;
+ let unitCost = G.rdPurchased.includes('prod_cut') ? Math.floor(p.cost * 0.8) : p.cost;
+ let soldCost = sold * unitCost;
+ let wasteCost = Math.floor(Math.max(0, p.unitsMade - sold) * unitCost * 0.2);
+ let cost = soldCost + wasteCost;
+ p.lastSold = sold; p.lastRevenue = rev - cost;
+ return rev - cost;
+}
+
+function calcFoodRevenue(p) {
+ const capacity = getTotalSalesCapacity();
+ let demanded = Math.floor(capacity * (p.popularity / 100) * getPopMult());
+ if (G.eventEffect === 'recession') demanded = Math.floor(demanded * 0.7);
+ demanded = Math.floor(demanded * getSeasonMult());
+ if (G.eventEffect === 'boom') demanded = Math.floor(demanded * 1.2);
+ if (G.eventEffect === 'bulkOrder') demanded = Math.floor(demanded * 1.5);
+ if (G.eventEffect === 'holiday') demanded = Math.floor(demanded * 1.25);
+ let sold = Math.min(p.unitsMade, capacity, demanded);
+ let rev = sold * p.chosenPrice;
+ let unitCost = G.rdPurchased.includes('prod_cut') ? Math.floor(p.cost * 0.8) : p.cost;
+ let soldCost = sold * unitCost;
+ let wasteCost = Math.floor(Math.max(0, p.unitsMade - sold) * unitCost * 0.2);
+ let cost = soldCost + wasteCost;
+ p.lastSold = sold; p.lastRevenue = rev - cost;
+ return rev - cost;
+}
+
+function calcInvestRevenue(inv) {
+ if (!inv.active) return 0;
+ const luckMap = {high:1.3,medium:1.0,low:0.7};
+ let luck = luckMap[BUSINESS_DEFS[G.businessType].investLuck];
+ if (G.eventEffect === 'tradedeal') luck += 0.1;
+ let chance = Math.min(1, inv.chance * luck);
+ const roll = Math.random();
+ if (roll <= chance) {
+ inv.lastResult = Math.floor(inv.cost * inv.reward);
+ inv.lastWin = true;
+ } else {
+ inv.lastResult = -Math.floor(inv.cost * 0.5);
+ inv.lastWin = false;
+ }
+ inv.turnsLeft--;
+ if (inv.turnsLeft <= 0) inv.active = false;
+ return inv.lastResult;
+}
+
+// ============================================================
+// RIVAL AI
+// ============================================================
+function updateRival() {
+ const r = G.rival;
+ r.prevMoney = r.money;
+
+ // Rival grows based on how many turns have passed
+ const baseGrowth = 0.03 + (G.turn * 0.002);
+ r.money = Math.floor(r.money * (1 + baseGrowth + (Math.random() * 0.04 - 0.02)));
+ if (G.turn % 4 === 0) { r.employees += Math.floor(Math.random() * 3) + 1; r.facilities++; }
+ if (G.turn % 3 === 0) r.products++;
+
+ // Market share: rival takes share if growing faster than you
+ const myGrowthRate = G.money > 0 ? (G.money - (G.history && G.history.length > 1 ? G.history[G.history.length-2].money : G.money)) / G.money : 0;
+ const rivGrowthRate = baseGrowth;
+
+ if (rivGrowthRate > myGrowthRate + 0.02) {
+ // Rival growing faster - takes market share
+ const steal = Math.floor(Math.random() * 3) + 1;
+ r.marketShare = Math.min(85, r.marketShare + steal);
+ G.marketShare = Math.max(5, G.marketShare - steal);
+ } else if (myGrowthRate > rivGrowthRate + 0.02) {
+ // You growing faster - gain market share
+ const gain = Math.floor(Math.random() * 3) + 1;
+ G.marketShare = Math.min(85, G.marketShare + gain);
+ r.marketShare = Math.max(5, r.marketShare - gain);
+ }
+
+ // Market share affects your reputation slightly
+ if (G.marketShare > 60) G.reputation = Math.min(100, G.reputation + 1);
+ if (G.marketShare < 20) G.reputation = Math.max(0, G.reputation - 1);
+
+ if (G.eventEffect === 'rivalBoost') {
+ r.marketShare = Math.min(85, r.marketShare + 5);
+ G.marketShare = Math.max(5, G.marketShare - 5);
+ }
+}
+
+// ============================================================
+// REPUTATION
+// ============================================================
+function updateReputation(net) {
+ if (net > 0) G.reputation = Math.min(100, G.reputation + 1);
+ else G.reputation = Math.max(0, G.reputation - 2);
+ if (G.eventEffect === 'award') G.reputation = Math.min(100, G.reputation + 15);
+ if (G.eventEffect === 'badpress') G.reputation = Math.max(0, G.reputation - 20);
+ if (G.rdPurchased.includes('rep_boost')) { G.reputation = Math.min(100, G.reputation + 20); G.rdPurchased = G.rdPurchased.filter(r => r !== 'rep_boost'); }
+}
+
+// ============================================================
+// EVENTS
+// ============================================================
+function rollEvent() {
+ if (G.turn <= 3) { G.pendingEvent = null; G.eventEffect = null; return; }
+ if (Math.random() < 0.2) {
+ const e = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
+ G.pendingEvent = e.text;
+ G.eventEffect = e.effect;
+
+ if (G.eventEffect === 'fire' && G.facilities.length > 0) {
+ const fi = Math.floor(Math.random() * G.facilities.length);
+ if (G.facilities[fi].level > 1) G.facilities[fi].level--;
+ }
+ if (G.eventEffect === 'tax') G.money = Math.max(0, G.money - 2000);
+ if (G.eventEffect === 'grant') G.money += 10000;
+ } else {
+ G.pendingEvent = null;
+ G.eventEffect = null;
+ }
+}
+
+// ============================================================
+// PRODUCT AGE DECAY
+// ============================================================
+function updateStaffMorale() {
+ // Staff happiness slowly decays each turn - need to keep them happy
+ for (const f of G.facilities) {
+ for (const e of f.employees) {
+ // Happiness decays slightly each turn
+ e.happiness = Math.max(20, e.happiness - Math.floor(Math.random() * 3));
+ // Recalculate productivity
+ e.productivity = e.skill * e.happiness / 100;
+ }
+ }
+ // Low morale warning
+ const avgHappiness = G.facilities.reduce((sum, f) => 
+ sum + f.employees.reduce((s, e) => s + e.happiness, 0), 0) / 
+ Math.max(1, getTotalEmployees());
+ if (avgHappiness < 40 && getTotalEmployees() > 0) {
+ G.pendingEvent = (G.pendingEvent || '') + ' ⚠ Staff morale is low! Productivity suffering.';
+ }
+}
+
+function ageProducts() {
+ const prods = G.businessType === 'food' ? G.activeProducts : G.availableProducts.filter(p => p.launched);
+ for (const p of prods) {
+ p.age = (p.age || 0) + 1;
+ if (p.age > 6 && Math.random() < 0.15) {
+ p.popularity = Math.max(10, p.popularity - Math.floor(Math.random() * 5) + 1);
+ }
+ }
+}
+
+// ============================================================
+// SCREEN NAVIGATION
+// ============================================================
+function showScreen(name) {
+ document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+ document.getElementById('screen-' + name).classList.add('active');
+ if (name === 'launch') buildLaunchScreen();
+ if (name === 'hire') buildHireScreen();
+ if (name === 'facility') buildFacilityScreen();
+ if (name === 'invest') buildInvestScreen();
+ if (name === 'finance') buildFinanceScreen();
+ if (name === 'rival') buildRivalScreen();
+ if (name === 'endturn') buildEndTurnScreen();
+ if (name === 'prestige') buildPrestigeScreen();
+ if (name === 'auth') { /* auth screen shown, nothing to build */ }
+ if (name === 'tutorial') buildTutorialScreen();
+ if (name === 'history') buildHistoryScreen();
+ if (name === 'settings') buildSettingsScreen();
+}
+
+function goToMenu() {
+ // Safety guard - if G not initialized, go to start screen
+ if (!G || !G.businessType) {
+   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+   document.getElementById('screen-start').classList.add('active');
+   return;
+ }
+ document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+ document.getElementById('screen-menu').classList.add('active');
+ updateMenu();
+ buildUserBar();
+ saveGame();
+ if (G.turn <= 3) showEarlyTip();
+}
+
+function showEarlyTip() {
+ const tips = {
+ 1: " Tip: Hire some employees first — you need staff to generate sales capacity.",
+ 2: " Tip: Launch a product if you haven't yet — you earn nothing without one.",
+ 3: " Tip: Consider investing — investments run for multiple turns and boost income."
+ };
+ if (tips[G.turn]) notify(tips[G.turn]);
+}
+
+function updateMenu() {
+ document.getElementById('menu-name').textContent = G.companyName;
+ document.getElementById('turn-num').textContent = G.turn;
+
+ const pct = Math.min(100, Math.floor((G.money / G.prestigeTarget) * 100));
+ document.getElementById('progress-text').textContent = pct + '% to £' + (G.prestigeTarget/1000000).toFixed(1) + 'M';
+ document.getElementById('progress-bar').style.width = pct + '%';
+
+ const repClass = G.reputation >= 70 ? 'rep-high' : G.reputation >= 40 ? 'rep-med' : 'rep-low';
+ document.getElementById('top-bar').innerHTML = `
+ <div class="top-bar-left">
+ <div class="stat"><span class="stat-label">Money</span><span class="stat-value money">£${Math.floor(G.money).toLocaleString()}</span></div>
+ <div class="stat"><span class="stat-label">Employees</span><span class="stat-value">${getTotalEmployees()}</span></div>
+ <div class="stat"><span class="stat-label">🏭 Facilities</span><span class="stat-value">${G.facilities.length}</span></div>
+ <div class="stat"><span class="stat-label">Capacity</span><span class="stat-value">${getTotalSalesCapacity()}</span></div>
+ <div class="stat"><span class="stat-label">Reputation</span><span class="stat-value ${repClass}">${G.reputation}/100</span></div>
+ <div class="stat"><span class="stat-label">Season</span><span class="stat-value">${getSeason()}</span></div>
+ ${G.prestige > 0 ? `<div class="stat"><span class="stat-label">⭐ Prestige</span><span class="stat-value" style="color:#c080ff;">*${G.prestige}</span></div>` : ''}
+ </div>`;
+
+ // Event banner
+ const ea = document.getElementById('event-area');
+ if (G.pendingEvent) {
+ const type = G.pendingEvent.includes('') || G.pendingEvent.includes('') || G.pendingEvent.includes('') || G.pendingEvent.includes('') || G.pendingEvent.includes(' Bad') ? 'bad' : G.pendingEvent.includes('') || G.pendingEvent.includes('') || G.pendingEvent.includes('') ? 'neutral' : 'good';
+ ea.innerHTML = `<div class="event-banner ${type}"><strong>Event:</strong> ${G.pendingEvent}</div>`;
+ } else { ea.innerHTML = ''; }
+
+ // Loan reminder
+ const la = document.getElementById('loan-area');
+ if (G.loan) {
+ la.innerHTML = `<div class="loan-active">💳 Active loan: £${G.loan.remaining.toLocaleString()} remaining | Interest: £${Math.floor(G.loan.remaining * G.loan.rate).toLocaleString()}/turn</div>`;
+ } else { la.innerHTML = ''; }
+
+ // Prestige button
+ const pb = document.getElementById('prestige-btn');
+ pb.style.display = G.money >= G.prestigeTarget ? 'block' : 'none';
+}
+
+// ============================================================
+// LAUNCH SCREEN
+// ============================================================
+function buildLaunchScreen() {
+ const div = document.getElementById('launch-content');
+ if (G.businessType === 'food') {
+ div.innerHTML = `
+ <label>Food name:</label><input type="text" id="food-name" placeholder="e.g. Cheeseburger">
+ <label>Type:</label>
+ <select id="food-type"><option value="main">Main</option><option value="side">Side</option><option value="starter">Starter</option><option value="dessert">Dessert</option></select>
+ <label>Luxury level:</label>
+ <select id="food-luxury"><option value="cheap">Cheap</option><option value="normal">✗rmal</option><option value="luxury">Luxury</option></select>
+ <div id="launch-error" class="error"></div>
+ <button class="btn btn-green btn-full" onclick="launchFood()">Add to Menu</button>`;
+ } else {
+ let html = '';
+ const season = getSeason();
+ for (let i = 0; i < G.availableProducts.length; i++) {
+ const p = G.availableProducts[i];
+ const sm = getSeasonMult();
+ const trendHtml = sm > 1.05
+ ? `<span class="trend-badge trend-up">↑ ${season} boost</span>`
+ : sm < 0.95 ? `<span class="trend-badge trend-down">↓ ${season} slow</span>` : '';
+ const badge = p.launched ? '<span class="badge">LAUNCHED</span>' : '';
+ const ageWarn = p.launched && p.age > 5 ? '<span class="badge badge-red">Ageing</span>' : '';
+ const btn = !p.launched
+ ? `<button class="btn btn-green" onclick="launchProduct(${i})">Launch</button>` : '';
+ html += `<div class="card">
+ <div class="card-info"><strong>${p.name}</strong> ${badge} ${ageWarn} ${trendHtml}<br>
+ Cost: £${p.cost} | Market price: £${p.market} | Popularity: ${p.popularity}/100</div>
+ ${btn}</div>`;
+ }
+ div.innerHTML = html;
+ }
+}
+
+function launchProduct(i) {
+ G.availableProducts[i].launched = true;
+ notify('Product launched!');
+ buildLaunchScreen();
+}
+
+function launchFood() {
+ const name = document.getElementById('food-name').value.trim();
+ if (!name) { document.getElementById('launch-error').textContent = 'Please enter a food name.'; return; }
+ const type = document.getElementById('food-type').value;
+ const luxury = document.getElementById('food-luxury').value;
+ const cost = foodCost(type, luxury);
+ const pop = randomPop(true, false);
+ G.activeProducts.push({name, type, luxury, cost, popularity: pop, age: 0, unitsMade: 0, chosenPrice: Math.floor(cost * 2.5), lastSold: 0, lastRevenue: 0});
+ notify('Added to menu!');
+ goToMenu();
+}
+
+// ============================================================
+// HIRE SCREEN
+// ============================================================
+function buildHireScreen() {
+ const div = document.getElementById('hire-content');
+ if (G.facilities.length === 0) { div.innerHTML = '<p style="color:#f77">Buy a facility first.</p>'; return; }
+ let html = '';
+ for (let i = 0; i < G.facilities.length; i++) {
+ const f = G.facilities[i];
+ const free = f.maxEmployees - f.employees.length;
+ const estEach = Math.floor((100 + 75*3) * BUSINESS_DEFS[G.businessType].salaryMult * (G.rdPurchased.includes('salary_cut') ? 0.85 : 1));
+ html += `<div class="card" style="flex-direction:column; align-items:flex-start;">
+ <div class="card-info"><strong>Facility ${i+1}</strong> — Level ${f.level}<br>
+ Employees: ${f.employees.length}/${f.maxEmployees} | Free: ${free}</div>
+ ${free > 0 ? `<div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+ <div class="bulk-row">
+ <button class="bulk-btn" onclick="hireN(${i},1)">+1</button>
+ <button class="bulk-btn" onclick="hireN(${i},5)">+5</button>
+ <button class="bulk-btn" onclick="hireN(${i},10)">+10</button>
+ <button class="bulk-btn" onclick="hireN(${i},${free})">Max</button>
+ </div>
+ <span style="color:#aad4ff; font-size:12px;">~£${estEach.toLocaleString()}/turn each</span>
+ </div>` : '<span style="color:#f77; font-size:13px;">Full</span>'}
+ ${f.employees.length > 0 ? `
+ <div style="margin-top:8px;">
+ <div style="font-size:12px; color:#888; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Boost Morale</div>
+ <div style="display:flex; gap:6px; flex-wrap:wrap;">
+ <button class="bulk-btn" onclick="boostMorale(${i},'pizza',500)" title="Pizza party - small boost">🍕 Pizza Party — £500</button>
+ <button class="bulk-btn" onclick="boostMorale(${i},'teamday',2000)" title="Team day out - medium boost">🎳 Team Day — £2,000</button>
+ <button class="bulk-btn" onclick="boostMorale(${i},'bonus',5000)" title="Cash bonus - big boost">💰 Pay Bonus — £5,000</button>
+ <button class="bulk-btn" onclick="boostMorale(${i},'retreat',10000)" title="Company retreat - massive boost">✈ Retreat — £10,000</button>
+ </div>
+ </div>` : ''}
+ ${f.employees.length > 0 ? `
+ <div style="font-size:12px; color:#aaa; margin-top:4px;">
+ Avg morale: <span style="color:${Math.floor(f.employees.reduce((s,e)=>s+e.happiness,0)/f.employees.length) > 60 ? '#5d5' : Math.floor(f.employees.reduce((s,e)=>s+e.happiness,0)/f.employees.length) > 40 ? '#fd5' : '#f77'}">
+ ${Math.floor(f.employees.reduce((s,e)=>s+e.happiness,0)/f.employees.length)}/100</span>
+ </div>
+ <button class="btn btn-red" style="font-size:12px; padding:5px 10px; margin-top:6px;" onclick="fireEmployee(${i})">Fire one employee</button>` : ''}
+ </div>`;
+ }
+ div.innerHTML = html;
+}
+
+function hireN(fi, n) {
+ const f = G.facilities[fi];
+ const free = f.maxEmployees - f.employees.length;
+ const num = Math.min(n, free);
+ for (let i = 0; i < num; i++) f.employees.push(createEmployee());
+ notify(`Hired ${num} employee(s)!`);
+ buildHireScreen();
+ updateMenu();
+}
+
+function fireEmployee(fi) {
+ const f = G.facilities[fi];
+ if (f.employees.length > 0) {
+ f.employees.pop();
+ G.reputation = Math.max(0, G.reputation - 3);
+ notify('Employee fired. Reputation -3.', true);
+ buildHireScreen();
+ updateMenu();
+ }
+}
+
+// ============================================================
+// FACILITY SCREEN
+// ============================================================
+function facilityTab(tab, el) {
+ currentFacilityTab = tab;
+ document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+ el.classList.add('active');
+ buildFacilityScreen();
+}
+
+function buildFacilityScreen() {
+ const div = document.getElementById('facility-content');
+ if (currentFacilityTab === 'buy') {
+ const canAfford1 = G.money >= 5000;
+ div.innerHTML = `
+ <div class="card" style="flex-direction:column; align-items:flex-start; gap:8px;">
+ <div class="card-info"><strong>New Facility</strong><br>
+ Cost: £5,000 each | Starts level 1 | 10 employee slots<br>
+ Your money: <strong style="color:#ffd700">£${Math.floor(G.money).toLocaleString()}</strong> | Facilities: ${G.facilities.length}</div>
+ <div class="bulk-row">
+ <button class="bulk-btn" onclick="buyN(1)" ${canAfford1 ? '' : 'disabled'}>Buy 1</button>
+ <button class="bulk-btn" onclick="buyN(5)" ${G.money >= 25000 ? '' : 'disabled'}>Buy 5</button>
+ <button class="bulk-btn" onclick="buyN(10)" ${G.money >= 50000 ? '' : 'disabled'}>Buy 10</button>
+ <button class="bulk-btn" onclick="buyMax()">Buy Max</button>
+ </div>
+ </div>`;
+ } else {
+ let html = '';
+ for (let i = 0; i < G.facilities.length; i++) {
+ const f = G.facilities[i];
+ const maxed = f.level >= 10;
+ html += `<div class="card" style="flex-direction:column; align-items:flex-start; gap:8px;">
+ <div class="card-info"><strong>Facility ${i+1}</strong> — Level ${f.level}/10 | £10,000/upgrade<br>
+ Employees: ${f.employees.length}/${f.maxEmployees}</div>
+ ${!maxed ? `<div class="bulk-row">
+ <button class="bulk-btn" onclick="upgradeN(${i},1)" ${G.money >= 10000 ? '' : 'disabled'}>+1</button>
+ <button class="bulk-btn" onclick="upgradeN(${i},5)" ${G.money >= 50000 ? '' : 'disabled'}>+5</button>
+ <button class="bulk-btn" onclick="upgradeN(${i},10-f.level)" ${G.money >= 10000 ? '' : 'disabled'}>Max</button>
+ </div>` : '<span class="badge">MAX</span>'}
+ </div>`;
+ }
+ div.innerHTML = html || '<p style="color:#888">✗ facilities yet.</p>';
+ }
+}
+
+function buyN(n) {
+ const max = Math.min(n, Math.floor(G.money / 5000));
+ for (let i = 0; i < max; i++) { G.facilities.push(createFacility()); G.money -= 5000; }
+ notify(`Bought ${max} facilit${max === 1 ? 'y' : 'ies'}!`);
+ buildFacilityScreen();
+ updateMenu();
+}
+
+function buyMax() {
+ const n = Math.floor(G.money / 5000);
+ buyN(n);
+}
+
+function upgradeN(fi, n) {
+ const f = G.facilities[fi];
+ let count = 0;
+ while (count < n && f.level < 10 && G.money >= 10000) {
+ G.money -= 10000; f.level++; f.maxEmployees += 5; count++;
+ }
+ notify(`Upgraded facility ${fi+1} by ${count} level(s)!`);
+ buildFacilityScreen();
+ updateMenu();
+}
+
+// ============================================================
+// INVEST / R&D SCREEN
+// ============================================================
+function investTab(tab, el) {
+ currentInvestTab = tab;
+ document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+ el.classList.add('active');
+ buildInvestScreen();
+}
+
+function buildInvestScreen() {
+ const div = document.getElementById('invest-content');
+ if (currentInvestTab === 'investments') {
+ let html = '';
+ for (let i = 0; i < G.investments.length; i++) {
+ const inv = G.investments[i];
+ const canAfford = G.money >= inv.cost;
+ const btn = inv.active
+ ? `<span class="badge badge-green">Active (${inv.turnsLeft} turns left)</span>`
+ : canAfford
+ ? `<button class="btn btn-green" onclick="invest(${i})">Invest £${inv.cost.toLocaleString()}</button>`
+ : `<span class="badge badge-red">Need £${inv.cost.toLocaleString()}</span>`;
+ html += `<div class="card">
+ <div class="card-info"><strong>${inv.name}</strong><br>
+ Cost: £${inv.cost.toLocaleString()} | Success: ${Math.floor(inv.chance*100)}% | Runs for ${inv.turns} turns</div>
+ ${btn}</div>`;
+ }
+ div.innerHTML = html;
+ } else {
+ let html = '';
+ for (let i = 0; i < G.rdUpgrades.length; i++) {
+ const rd = G.rdUpgrades[i];
+ const bought = G.rdPurchased.includes(rd.id);
+ const canAfford = G.money >= rd.cost;
+ const btn = bought
+ ? '<span class="badge badge-green">Purchased</span>'
+ : canAfford
+ ? `<button class="btn btn-purple" onclick="buyRD(${i})">Buy £${rd.cost.toLocaleString()}</button>`
+ : `<span class="badge badge-red">Need £${rd.cost.toLocaleString()}</span>`;
+ html += `<div class="card">
+ <div class="card-info"><strong>${rd.name}</strong><br>${rd.desc}</div>
+ ${btn}</div>`;
+ }
+ div.innerHTML = html;
+ }
+}
+
+function invest(i) {
+ const inv = G.investments[i];
+ if (inv.active || G.money < inv.cost) return;
+ G.money -= inv.cost;
+ inv.active = true;
+ inv.turnsLeft = inv.turns;
+ notify('Investment made!');
+ buildInvestScreen();
+ updateMenu();
+}
+
+function buyRD(i) {
+ const rd = G.rdUpgrades[i];
+ if (G.rdPurchased.includes(rd.id) || G.money < rd.cost) return;
+ G.money -= rd.cost;
+ G.rdPurchased.push(rd.id);
+ notify('R&D upgrade purchased!');
+ buildInvestScreen();
+ updateMenu();
+}
+
+// ============================================================
+// FINANCE SCREEN (LOANS)
+// ============================================================
+function buildFinanceScreen() {
+ const div = document.getElementById('finance-content');
+ if (G.loan) {
+ div.innerHTML = `
+ <div class="loan-active" style="font-size:14px; margin-bottom:16px;">
+ <strong>Active Loan</strong><br>
+ Remaining: £${G.loan.remaining.toLocaleString()}<br>
+ Interest rate: ${Math.floor(G.loan.rate * 100)}% per turn<br>
+ Interest this turn: £${Math.floor(G.loan.remaining * G.loan.rate).toLocaleString()}
+ </div>
+ <button class="btn btn-green btn-full" onclick="repayLoan()">
+ Repay £${Math.min(Math.floor(G.money * 0.5), G.loan.remaining).toLocaleString()} (50% of cash)
+ </button>`;
+ } else {
+ div.innerHTML = `
+ <p style="color:#aaa; margin-bottom:14px; font-size:14px;">Take out a loan to accelerate growth. Interest charges each turn.</p>
+ <div class="card" style="flex-direction:column; align-items:flex-start; gap:8px;">
+ <div class="card-info"><strong>Small Loan</strong><br>£20,000 at 5% interest per turn</div>
+ <button class="btn btn-gold" onclick="takeLoan(20000,0.03)">Take Loan</button>
+ </div>
+ <div class="card" style="flex-direction:column; align-items:flex-start; gap:8px;">
+ <div class="card-info"><strong>Medium Loan</strong><br>£50,000 at 8% interest per turn</div>
+ <button class="btn btn-gold" onclick="takeLoan(50000,0.05)">Take Loan</button>
+ </div>
+ <div class="card" style="flex-direction:column; align-items:flex-start; gap:8px;">
+ <div class="card-info"><strong>Large Loan</strong><br>£100,000 at 12% interest per turn</div>
+ <button class="btn btn-gold" onclick="takeLoan(100000,0.08)">Take Loan</button>
+ </div>`;
+ }
+}
+
+function takeLoan(amount, rate) {
+ if (G.loan) return;
+ G.loan = { original: amount, remaining: amount, rate };
+ G.money += amount;
+ notify(`Loan of £${amount.toLocaleString()} received!`);
+ goToMenu();
+}
+
+function repayLoan() {
+ if (!G.loan) return;
+ const pay = Math.min(Math.floor(G.money * 0.5), G.loan.remaining);
+ G.money -= pay;
+ G.loan.remaining -= pay;
+ if (G.loan.remaining <= 0) { G.loan = null; notify('Loan fully repaid!'); }
+ else notify(`Repaid £${pay.toLocaleString()}. £${G.loan.remaining.toLocaleString()} remaining.`);
+ goToMenu();
+}
+
+// ============================================================
+// RIVAL SCREEN
+// ============================================================
+function buildRivalScreen() {
+ const r = G.rival;
+ const prevMoney = r.prevMoney || r.money;
+ const growth = r.money - prevMoney;
+ const growthPct = prevMoney > 0 ? ((growth / prevMoney) * 100).toFixed(1) : '0.0';
+ const div = document.getElementById('rival-content');
+ div.innerHTML = `
+ <div class="rival-panel">
+ <h3> ${r.name}</h3>
+ <div class="card-info" style="margin-bottom:10px;">
+ <strong>Valuation:</strong> £${Math.floor(r.money).toLocaleString()}<br>
+ <strong>Growth last turn:</strong>
+ <span style="color:${growth >= 0 ? '#f77' : '#5d5'}">
+ ${growth >= 0 ? '+' : ''}£${Math.floor(growth).toLocaleString()} (${growth >= 0 ? '+' : ''}${growthPct}%)
+ </span>
+ </div>
+ <p style="color:${G.money > r.money ? '#5d5' : '#f77'}; font-size:14px;">
+ ${G.money > r.money ? '✓ You are valued higher than your rival.' : '✗ Rival is worth more than you. Grow faster!'}
+ </p>
+ </div>
+ <div class="card">
+ <div class="card-info"><strong>Your valuation:</strong> £${Math.floor(G.money).toLocaleString()}</div>
+ </div>`;
+}
+
+// ============================================================
+// END TURN SCREEN
+// ============================================================
+function buildEndTurnScreen() {
+ document.getElementById('endturn-title').textContent = 'Production — Turn ' + G.turn + ' (' + getSeason() + ')';
+ const div = document.getElementById('endturn-content');
+ const products = launchedProducts();
+ const capacity = getTotalSalesCapacity();
+
+ if (products.length === 0) {
+ const salWarn = G.turn === 1 ? '' : `<p style="color:#f77; font-size:13px; margin-top:8px;">You will pay £${getTotalSalaries().toLocaleString()} in salaries this turn with no income.</p>`;
+ div.innerHTML = `<div class="event-banner bad">You have no products launched! Go back and launch one before ending your turn — otherwise you earn nothing.</div>
+ ${salWarn}
+ <button class="btn btn-orange btn-full" onclick="confirmProduction()">End Turn Anyway</button>
+ <button class="btn btn-green btn-full" style="margin-top:8px;" onclick="goToMenu()">← Go Back and Launch</button>`;
+ return;
+ }
+
+ let html = `<p style="color:#aad4ff; font-size:13px; margin-bottom:12px;">
+ Sales capacity: <strong>${capacity}</strong> | Season: <strong>${getSeason()}</strong> 
+ (${G.businessType} ${getSeasonMult() > 1 ? '↑' : getSeasonMult() < 1 ? '↓' : '—'} ${Math.floor((getSeasonMult()-1)*100)}%)</p>`;
+
+ for (let i = 0; i < products.length; i++) {
+ const p = products[i];
+ const recPrice = G.businessType === 'food' ? Math.floor(p.cost * 2.5) : p.market;
+ let forecastBase;
+ if (G.businessType === 'food') {
+ const repBonus = (G.reputation - 50) / 500;
+ forecastBase = Math.floor(capacity * Math.min(1, Math.max(0.1, (p.popularity / 100) * getPopMult() + repBonus)));
+ } else {
+ const perCap = Math.floor(capacity / products.length);
+ const demand = p.popularity / 100;
+ const priceAdj = Math.min(2, Math.max(0.3, p.market / (p.chosenPrice || p.market)));
+ const repBonus = (G.reputation - 50) / 500;
+ forecastBase = Math.floor(perCap * Math.min(1, Math.max(0, demand * priceAdj + repBonus)));
+ }
+ const forecastLow = Math.floor(forecastBase * 0.85);
+ const forecastHigh = Math.floor(forecastBase * 1.15);
+ const forecast = forecastBase;
+ html += `<div class="prod-row">
+ <h3>${p.name} — Pop: ${p.popularity}/100 | Age: ${p.age} turns</h3>
+ <p style="color:#aaa; font-size:12px; margin-bottom:8px;">Cost: £${p.cost} | Rec price: £${recPrice} | Forecast sales: ~${forecast}</p>
+ <div class="prod-inputs">
+ <div>
+ <label>Units to produce:</label>
+ <div style="font-size:12px; color:#aad4ff; margin-bottom:4px;">
+ Forecast: <strong>${forecastLow}–${forecastHigh}</strong> units
+ <span style="color:#888; margin-left:8px;">(rep, price &amp; luck affect actual sales)</span>
+ </div>
+ <input type="number" id="units-${i}" value="${forecast}" min="0">
+ </div>
+ <div><label>Selling price: £</label><input type="number" id="price-${i}" value="${p.chosenPrice || recPrice}" min="1"></div>
+ </div></div>`;
+ }
+
+ html += `<button class="btn btn-orange btn-full" onclick="confirmProduction()">⏭ Confirm & End Turn </button>
+ <button class="btn btn-grey btn-full" style="margin-top:6px;" onclick="goToMenu()">← Back</button>`;
+ div.innerHTML = html;
+}
+
+function confirmProduction() {
+ const products = launchedProducts();
+ for (let i = 0; i < products.length; i++) {
+ products[i].unitsMade = parseInt(document.getElementById('units-' + i).value) || 0;
+ products[i].chosenPrice = parseInt(document.getElementById('price-' + i).value) || 1;
+ }
+ runEndTurn(products);
+}
+
+function runEndTurn(products) {
+ let productRev = 0, investRev = 0;
+ for (const p of products) productRev += G.businessType === 'food' ? calcFoodRevenue(p) : calcProductRevenue(p);
+ for (const inv of G.investments) investRev += calcInvestRevenue(inv);
+
+ // ✗ salaries on turn 1 - give player time to get started
+ const salaries = G.turn === 1 ? 0 : getTotalSalaries();
+ let loanInterest = 0;
+ if (G.loan) {
+ loanInterest = Math.floor(G.loan.remaining * G.loan.rate);
+ G.loan.remaining += loanInterest;
+ G.money -= loanInterest;
+ }
+
+ const net = productRev + investRev - salaries;
+ G.money += net;
+
+ updateReputation(net);
+ updateRival();
+ ageProducts();
+ updateStaffMorale();
+ rollEvent();
+ G.seasonIndex++;
+
+ showSummary(products, productRev, investRev, salaries, loanInterest, net);
+}
+
+function showSummary(products, productRev, investRev, salaries, loanInt, net) {
+ // Record turn history
+ if (!G.history) G.history = [];
+ G.history.push({
+ turn: G.turn,
+ money: Math.floor(G.money),
+ net: Math.floor(net),
+ productRev: Math.floor(productRev),
+ investRev: Math.floor(investRev),
+ salaries: Math.floor(salaries),
+ event: G.pendingEvent ? G.pendingEvent.substring(0,40) : null
+ });
+ document.getElementById('endturn-title').textContent = 'Turn ' + G.turn + ' Summary';
+ let html = '<div class="summary-box">';
+ html += '<div class="section-head">Products</div>';
+ for (const p of products) {
+ const cls = p.lastRevenue >= 0 ? 'pos' : 'neg';
+ html += `<div class="summary-row ${p.lastRevenue >= 0 ? 'pos' : 'neg'}"><span>${p.name} (sold ${p.lastSold})</span><span>${p.lastRevenue >= 0 ? '+' : '-'}£${Math.abs(Math.floor(p.lastRevenue)).toLocaleString()}</span></div>`;
+ }
+ const activeInvs = G.investments.filter(i => i.lastResult !== 0);
+ if (activeInvs.length > 0) {
+ html += '<div class="section-head">Investments</div>';
+ for (const inv of G.investments) {
+ if (inv.lastResult === 0) continue;
+ html += `<div class="summary-row ${inv.lastWin ? 'pos' : 'neg'}"><span>${inv.name}</span><span>${inv.lastResult >= 0 ? '+' : '-'}£${Math.abs(inv.lastResult).toLocaleString()}</span></div>`;
+ }
+ }
+ html += '<div class="section-head">Costs</div>';
+ html += `<div class="summary-row ${productRev >= 0 ? 'pos' : 'neg'}"><span>Product revenue</span><span>${productRev >= 0 ? '+' : '-'}£${Math.abs(Math.floor(productRev)).toLocaleString()}</span></div>`;
+ html += `<div class="summary-row ${investRev >= 0 ? 'pos' : 'neg'}"><span>Investment revenue</span><span>${investRev >= 0 ? '+' : '-'}£${Math.abs(Math.floor(investRev)).toLocaleString()}</span></div>`;
+ html += `<div class="summary-row neg"><span>Salaries</span><span>-£${salaries.toLocaleString()}</span></div>`;
+ if (loanInt > 0) html += `<div class="summary-row neg"><span>Loan interest</span><span>-£${loanInt.toLocaleString()}</span></div>`;
+ const netCls = net >= 0 ? 'pos' : 'neg';
+ html += `<div class="summary-row total ${netCls}"><span>Net income</span><span>${net >= 0 ? '+' : '-'}£${Math.abs(Math.floor(net)).toLocaleString()}</span></div>`;
+ html += `<div class="summary-row total"><span>Balance</span><span style="color:#ffd700">£${Math.floor(G.money).toLocaleString()}</span></div>`;
+ html += '</div>';
+
+ if (G.pendingEvent) {
+ const type = G.pendingEvent.includes('')||G.pendingEvent.includes('')||G.pendingEvent.includes('')||G.pendingEvent.includes('')||G.pendingEvent.includes(' Bad') ? 'bad' : 'neutral';
+ html += `<div class="event-banner ${G.pendingEvent.includes(' Your')||G.pendingEvent.includes('')||G.pendingEvent.includes('')||G.pendingEvent.includes('') ? 'good' : type}"><strong>Event this turn:</strong> ${G.pendingEvent}</div>`;
+ }
+
+ if (G.money < 0) {
+ html += `<button class="btn btn-green btn-full" onclick="endGame('bankrupt')">Continue →</button>`;
+ } else {
+ if (G.money >= G.prestigeTarget) {
+ html += `<div class="event-banner good" style="margin-top:10px;">You have reached £${(G.prestigeTarget/1000000).toFixed(1)}M! Prestige for a permanent bonus, or keep growing.</div>`;
+ html += `<button class="btn btn-purple btn-full" style="margin-top:6px;" onclick="showScreen('prestige')">⭐ Prestige ✗w</button>`;
+ }
+ html += `<button class="btn btn-green btn-full" style="margin-top:6px;" onclick="nextTurn()">Next Turn</button>`;
+ }
+
+ document.getElementById('endturn-content').innerHTML = html;
+ G.turn++;
+}
+
+function nextTurn() { goToMenu(); }
+function endGame(result) { showGameOver(result === 'win'); }
+
+// ============================================================
+// PRESTIGE SCREEN
+// ============================================================
+function buildPrestigeScreen() {
+ const div = document.getElementById('prestige-content');
+ const newMult = (1 + (G.prestige + 1) * 0.1).toFixed(1);
+ const nextTarget = G.prestigeTarget * 2;
+ div.innerHTML = `
+ <div class="prestige-stars">${'*'.repeat(G.prestige + 1)}</div>
+ <div class="summary-box">
+ <p style="color:#c080ff; font-size:15px; margin-bottom:10px;">Prestige resets your company but carries over permanent bonuses.</p>
+ <div class="summary-row"><span>Current prestige stars</span><span style="color:#c080ff">${G.prestige}</span></div>
+ <div class="summary-row"><span>New prestige stars</span><span style="color:#ffd700">${G.prestige + 1}</span></div>
+ <div class="summary-row"><span>New starting money multiplier</span><span style="color:#5d5">${newMult}x</span></div>
+ <div class="summary-row"><span>Next prestige target</span><span style="color:#f77">£${(nextTarget/1000000).toFixed(1)}M</span></div>
+ <div class="summary-row"><span>Your money is reset</span><span style="color:#f77">✓</span></div>
+ </div>
+ <p style="color:#888; font-size:13px; margin-bottom:10px;">Prestige to earn a permanent starting money boost and bragging rights.</p>
+ <button class="btn btn-purple btn-full" onclick="doPrestige()">⭐ Prestige ✗w</button>`;
+}
+
+function doPrestige() {
+ G.prestige++;
+ G.prestigeMultiplier = 1 + G.prestige * 0.1;
+ const savedPrestige = G.prestige;
+ const savedMult = G.prestigeMultiplier;
+ const savedTarget = G.prestigeTarget * 2;
+ const savedType = G.businessType;
+ const savedName = G.companyName;
+
+ newGame();
+ G.prestige = savedPrestige;
+ G.prestigeMultiplier = savedMult;
+ G.prestigeTarget = savedTarget;
+ G.businessType = savedType;
+ G.companyName = savedName;
+ G.money = BUSINESS_DEFS[G.businessType].startMoney * G.prestigeMultiplier - 5000;
+ G.facilities.push(createFacility());
+ if (G.businessType !== 'food') {
+ G.availableProducts = BUSINESS_DEFS[G.businessType].products.map(p => ({
+ ...p, launched:false, age:0,
+ popularity: Math.min(100, randomPop(false, G.businessType === 'clothing') + 15),
+ unitsMade:0, chosenPrice:p.market, lastSold:0, lastRevenue:0
+ }));
+ }
+ G.investments = INVESTMENT_DEFS.map(i => ({...i, active:false, turnsLeft:0, lastResult:0, lastWin:false}));
+ G.rdUpgrades = RD_UPGRADES.map(r => ({...r, purchased:false}));
+ initRival();
+ notify(`Prestige ${G.prestige}! Next target: £${(G.prestigeTarget/1000000).toFixed(1)}M`);
+ submitToLeaderboard();
+ goToMenu();
+}
+
+// ============================================================
+// GAME OVER
+// ============================================================
+function showGameOver(won) {
+ submitToLeaderboard();
+ document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+ document.getElementById('screen-gameover').classList.add('active');
+ document.getElementById('gameover-content').innerHTML = `
+ <div class="gameover-box ${won ? '' : ''}">
+ <h1 style="color:${won ? '#ffd700' : '#f55'}">${won ? ' You Win!' : ' Bankrupt!'}</h1>
+ <p style="font-size:16px; color:#ddd; margin-bottom:10px;">
+ ${won ? 'You built a £10,000,000 empire!' : 'Your company ran out of money on turn ' + G.turn + '.'}
+ </p>
+ ${G.prestige > 0 ? `<div class="prestige-stars">${'*'.repeat(G.prestige)}</div>` : ''}
+ <div class="gameover-stats">
+ Final balance: £${Math.floor(G.money).toLocaleString()}<br>
+ Turns played: ${G.turn}<br>
+ Market share: ${G.marketShare}%<br>
+ Reputation: ${G.reputation}/100<br>
+ Prestige stars: ${G.prestige}
+ </div>
+ <button class="btn btn-green btn-full" onclick="resetGame()">Play Again</button>
+ </div>`;
+}
+
+function resetGame() {
+ selectedBusinessType = '';
+ document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
+ document.getElementById('company-name').value = '';
+ document.getElementById('start-error').textContent = '';
+ document.getElementById('type-info').innerHTML = 'Select a business type to see its stats.';
+ G = {};
+ document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+ document.getElementById('screen-start').classList.add('active');
+}
+
+// ============================================================
+// NOTIFICATION
+// ============================================================
+function notify(msg, bad) {
+ const el = document.getElementById('notification');
+ el.textContent = msg;
+ el.className = bad ? 'bad' : '';
+ el.style.display = 'block';
+ if (notifTimer) clearTimeout(notifTimer);
+ notifTimer = setTimeout(() => el.style.display = 'none', 2500);
+}
+
+// ============================================================
+// FIREBASE
+// ============================================================
+const firebaseConfig = {
+ apiKey: "AIzaSyBL5RJQieUqdII0z2J-z4h3Tuxx7T1sSCY",
+ authDomain: "company-architect.firebaseapp.com",
+ projectId: "company-architect",
+ storageBucket: "company-architect.firebasestorage.app",
+ messagingSenderId: "1077518744033",
+ appId: "1:1077518744033:web:7df78e4eb6174b558c3aa0",
+ measurementId: "G-C7FTT3RLML"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// currentUser declared at top of script
+
+function authTab(mode, el) {
+ authMode = mode;
+ document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+ el.classList.add('active');
+ document.getElementById('auth-submit-btn').textContent = mode === 'login' ? 'Login' : 'Create Account';
+ document.getElementById('auth-name-wrap').style.display = mode === 'register' ? 'block' : 'none';
+ document.getElementById('auth-error').textContent = '';
+}
+
+function signInGoogle() {
+ const provider = new firebase.auth.GoogleAuthProvider();
+ auth.signInWithPopup(provider).catch(e => {
+ document.getElementById('auth-error').textContent = e.message;
+ });
+}
+
+function submitAuth() {
+ const email = document.getElementById('auth-email').value.trim();
+ const password = document.getElementById('auth-password').value;
+ const errEl = document.getElementById('auth-error');
+ if (!email || !password) { errEl.textContent = 'Please fill in all fields.'; return; }
+ if (authMode === 'login') {
+ auth.signInWithEmailAndPassword(email, password)
+ .catch(e => { errEl.textContent = 'Login failed: ' + e.message; });
+ } else {
+ const displayName = document.getElementById('auth-displayname').value.trim() || email.split('@')[0];
+ auth.createUserWithEmailAndPassword(email, password)
+ .then(cred => cred.user.updateProfile({ displayName }))
+ .catch(e => { errEl.textContent = 'Registration failed: ' + e.message; });
+ }
+}
+
+function playAsGuest() {
+ isGuest = true;
+ currentUser = null;
+ showScreen('start');
+}
+
+function signOut() {
+ auth.signOut().then(() => { currentUser = null; G = {}; showScreen('auth'); });
+}
+
+auth.onAuthStateChanged(user => {
+ if (user) {
+ currentUser = user;
+ isGuest = false;
+ loadSavedGame().then(loaded => {
+ if (loaded) { goToMenu(); } else { showScreen('start'); }
+ });
+ }
+});
+
+async function saveGame() {
+ if (!currentUser || isGuest) return;
+ if (!navigator.onLine) { console.log("Offline - save skipped"); return; }
+ try {
+ await db.collection('saves').doc(currentUser.uid).set({
+ turn: G.turn, money: G.money, businessType: G.businessType,
+ companyName: G.companyName, prestige: G.prestige,
+ prestigeMultiplier: G.prestigeMultiplier, prestigeTarget: G.prestigeTarget,
+ reputation: G.reputation, marketShare: G.marketShare,
+ seasonIndex: G.seasonIndex, rdPurchased: G.rdPurchased, loan: G.loan || null,
+ facilities: G.facilities.map(f => ({ level: f.level, maxEmployees: f.maxEmployees, employeeCount: f.employees.length })),
+ activeProducts: G.activeProducts,
+ availableProducts: (G.availableProducts || []).map(p => ({
+ name: p.name, cost: p.cost, market: p.market, launched: p.launched,
+ age: p.age, popularity: p.popularity, chosenPrice: p.chosenPrice
+ })),
+ investments: G.investments.map(i => ({ name: i.name, active: i.active, turnsLeft: i.turnsLeft })),
+ rdUpgrades: G.rdUpgrades.map(r => ({ id: r.id, purchased: r.purchased })),
+ history: (G.history || []).slice(-20),
+ savedAt: firebase.firestore.FieldValue.serverTimestamp()
+ });
+ } catch(e) { console.log('Save failed:', e); }
+}
+
+async function loadSavedGame() {
+ if (!currentUser) return false;
+ try {
+ const doc = await db.collection('saves').doc(currentUser.uid).get();
+ if (!doc.exists) return false;
+ const d = doc.data();
+ newGame();
+ G.turn = d.turn||1; G.money = d.money||0; G.businessType = d.businessType;
+ G.companyName = d.companyName; G.prestige = d.prestige||0;
+ G.prestigeMultiplier = d.prestigeMultiplier||1.0; G.prestigeTarget = d.prestigeTarget||1000000;
+ G.reputation = d.reputation||60; G.marketShare = d.marketShare||40;
+ G.seasonIndex = d.seasonIndex||0; G.rdPurchased = d.rdPurchased||[]; G.loan = d.loan||null;
+ G.facilities = (d.facilities||[]).map(f => {
+ const fac = { level: f.level, maxEmployees: f.maxEmployees, employees: [] };
+ for (let i = 0; i < f.employeeCount; i++) fac.employees.push(createEmployee());
+ return fac;
+ });
+ G.activeProducts = d.activeProducts||[];
+ G.availableProducts = d.availableProducts||[];
+ G.investments = INVESTMENT_DEFS.map(def => {
+ const sv = (d.investments||[]).find(i => i.name === def.name);
+ return { ...def, active: sv?sv.active:false, turnsLeft: sv?sv.turnsLeft:0, lastResult:0, lastWin:false };
+ });
+ G.history = d.history || [];
+ G.rdUpgrades = RD_UPGRADES.map(def => {
+ const sv = (d.rdUpgrades||[]).find(r => r.id === def.id);
+ return { ...def, purchased: sv?sv.purchased:false };
+ });
+ initRival();
+ return true;
+ } catch(e) { console.log('Load failed:', e); return false; }
+}
+
+async function submitToLeaderboard() {
+ if (!currentUser || isGuest) return;
+ try {
+ const displayName = currentUser.displayName || currentUser.email.split('@')[0];
+ const existing = await db.collection('leaderboard').doc(currentUser.uid).get();
+ const existingMoney = existing.exists ? (existing.data().bestMoney||0) : 0;
+ await db.collection('leaderboard').doc(currentUser.uid).set({
+ name: displayName, prestige: G.prestige,
+ bestMoney: Math.max(G.money, existingMoney),
+ businessType: G.businessType,
+ updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+ }, { merge: true });
+ } catch(e) { console.log('Leaderboard submit failed:', e); }
+}
+
+async function loadLeaderboard() {
+ const div = document.getElementById('leaderboard-content');
+ div.innerHTML = '<p style="color:#888;">Loading...</p>';
+ try {
+ const snap = await db.collection('leaderboard')
+ .orderBy('prestige','desc').limit(20).get();
+ if (snap.empty) { div.innerHTML = '<p style="color:#888;text-align:center;margin-top:20px;">✗ scores yet. Be the first!</p>'; return; }
+ const medals = [['🥇','🥈','🥉']];
+ let html = ''; let rank = 1;
+ snap.forEach(doc => {
+ const d = doc.data();
+ const isYou = currentUser && doc.id === currentUser.uid;
+ const medal = medals[rank-1]||rank;
+ const te = {tech:'',clothing:'',food:''}[d.businessType]||'';
+ html += `<div class="lb-row ${isYou?'lb-you':''}">
+ <div class="lb-rank">${medal}</div>
+ <div class="lb-name">${d.name}${isYou?' <span style="color:#ffd700;font-size:11px;">(you)</span>':''}</div>
+ <div class="lb-detail">${te} *${d.prestige||0}<br>£${Math.floor(d.bestMoney||0).toLocaleString()}</div>
+ </div>`;
+ rank++;
+ });
+ div.innerHTML = html;
+ } catch(e) { div.innerHTML = '<p style="color:#f77;">Could not load leaderboard.</p>'; }
+}
+
+function buildUserBar() {
+ const existing = document.getElementById('user-bar');
+ if (existing) existing.remove();
+ const bar = document.createElement('div');
+ bar.id = 'user-bar'; bar.className = 'user-bar';
+ if (currentUser) {
+   const name = currentUser.displayName || currentUser.email.split('@')[0];
+   bar.innerHTML = `
+     <div style="display:flex;align-items:center;gap:8px;">
+       <span class="user-bar-name">Signed in as <span>${name}</span></span>
+       <span style="color:#5d5;font-size:12px;">● Saving</span>
+     </div>
+     <button class="btn btn-grey" style="padding:6px 14px;font-size:13px;" onclick="showScreen('settings')">⚙ Settings</button>`;
+ } else {
+   bar.innerHTML = `
+     <div style="display:flex;align-items:center;gap:8px;">
+       <span class="user-bar-name" style="color:#f77;">Guest — progress won't save</span>
+     </div>
+     <button class="btn btn-grey" style="padding:6px 14px;font-size:13px;" onclick="showScreen('settings')">⚙ Settings</button>`;
+ }
+ document.getElementById('screen-menu').insertBefore(bar, document.getElementById('screen-menu').firstChild);
+}
+
+
+
+// ============================================================
+// FINANCIAL HISTORY
+// ============================================================
+function buildHistoryScreen() {
+ const div = document.getElementById('history-content');
+ if (!G.history || G.history.length === 0) {
+ div.innerHTML = '<p style="color:#888; text-align:center; margin-top:20px;">✗ history yet — complete a turn first.</p>';
+ return;
+ }
+ let html = '';
+ const recent = [...G.history].reverse().slice(0, 20);
+ for (const h of recent) {
+ const netCls = h.net >= 0 ? '#5d5' : '#f77';
+ const netSign = h.net >= 0 ? '+' : '-';
+ html += `<div class="card" style="flex-direction:column; align-items:flex-start; gap:4px;">
+ <div style="display:flex; justify-content:space-between; width:100%;">
+ <strong style="color:#ffd700;">Turn ${h.turn}</strong>
+ <span style="color:${netCls}; font-weight:bold;">${netSign}£${Math.abs(h.net).toLocaleString()}</span>
+ </div>
+ <div style="font-size:12px; color:#aaa; display:flex; gap:14px; flex-wrap:wrap;">
+ <span>Products: +£${h.productRev.toLocaleString()}</span>
+ <span>Investments: ${h.investRev >= 0 ? '+' : '-'}£${Math.abs(h.investRev).toLocaleString()}</span>
+ <span>Salaries: -£${h.salaries.toLocaleString()}</span>
+ </div>
+ <div style="font-size:12px; color:#ffd700;">Balance: £${h.money.toLocaleString()}</div>
+ ${h.event ? `<div style="font-size:11px; color:#888;">${h.event}...</div>` : ''}
+ </div>`;
+ }
+ div.innerHTML = html;
+}
+
+// ============================================================
+// TUTORIAL
+// ============================================================
+const TUTORIAL_STEPS = [
+ { title:"Welcome to Company Architect!", icon:"CA", text:"Your goal is to grow your company and reach the prestige target. Each prestige gives you a permanent bonus and raises the next target.", btn:"Next →" },
+ { title:"Step 1 — 👥 Hire Employees", icon:"01", text:"Employees generate your sales capacity — the number of units you can sell each turn. ✗ employees means no sales. Hire at least 3-5 to start.", btn:"Next →" },
+ { title:"Step 2 — Launch a Product", icon:"02", text:"You earn nothing without a product. Go to 🚀 Launch Product and pick one. Each product has a production cost and a market price — the gap is your margin.", btn:"Next →" },
+ { title:"Step 3 — Set Production", icon:"03", text:"When you End Turn, you set how many units to produce and at what price. Stick close to the forecast — producing too many means unsold stock you still paid for.", btn:"Next →" },
+ { title:"Step 4 — Price Wisely", icon:"04", text:"Pricing too far above the market price kills demand. Pricing below boosts sales but cuts margin. Start at market price and adjust from there.", btn:"Next →" },
+ { title:"Step 5 — Invest and Upgrade", icon:"05", text:"Once you're profitable, invest in the investment market and buy R&D upgrades. Upgrade facilities to unlock more employee slots and higher sales capacity.", btn:"Next →" },
+ { title:"Step 6 — Prestige", icon:"06", text:"When you hit your prestige target you can reset with a permanent starting money multiplier. Each prestige the target doubles — harder but your bonus grows too.", btn:"Let's go! →" }
+];
+
+// tutorialStep declared at top
+
+function buildTutorialScreen() {
+ tutorialStep = 0;
+ renderTutorialStep();
+}
+
+function renderTutorialStep() {
+ const step = TUTORIAL_STEPS[tutorialStep];
+ const isLast = tutorialStep === TUTORIAL_STEPS.length - 1;
+ const div = document.getElementById('tutorial-content');
+ const dots = TUTORIAL_STEPS.map((_, i) =>
+ `<span style="width:8px;height:8px;border-radius:50%;background:${i === tutorialStep ? '#ffd700' : '#444'};display:inline-block;margin:0 3px;"></span>`
+ ).join('');
+ div.innerHTML = `
+ <div style="text-align:center; font-size:52px; margin-bottom:12px;">${step.icon}</div>
+ <div class="card" style="flex-direction:column; align-items:flex-start; gap:10px; padding:20px;">
+ <h3 style="color:#ffd700; font-size:16px;">${step.title}</h3>
+ <p style="color:#ccc; font-size:14px; line-height:1.7;">${step.text}</p>
+ </div>
+ <div style="text-align:center; margin:14px 0;">${dots}</div>
+ <div style="display:flex; gap:10px;">
+ ${tutorialStep > 0 ? '<button class="btn btn-grey" style="flex:1;" onclick="tutorialBack()">← Back</button>' : ''}
+ <button class="btn btn-${isLast ? 'green' : 'blue'}" style="flex:2;" onclick="${isLast ? 'finishTutorial()' : 'tutorialNext()'}"> ${step.btn}</button>
+ </div>
+ ${tutorialStep === 0 ? '<button class="btn btn-grey btn-full" style="margin-top:8px;" onclick="goToMenu()">Skip tutorial</button>' : ''}
+ `;
+}
+
+function tutorialNext() { if (tutorialStep < TUTORIAL_STEPS.length - 1) { tutorialStep++; renderTutorialStep(); } }
+function tutorialBack() { if (tutorialStep > 0) { tutorialStep--; renderTutorialStep(); } }
+function finishTutorial() { goToMenu(); notify("Tutorial complete! Check Tips anytime for reminders."); }
+
+function startGameWithTutorial() {
+ const name = document.getElementById('company-name').value.trim();
+ const err = document.getElementById('start-error');
+ if (!selectedBusinessType) { err.textContent = 'Please select a business type.'; return; }
+ if (!name) { err.textContent = 'Please enter a company name.'; return; }
+ startGame();
+ showScreen('tutorial');
+}
+
+// ============================================================
+// GDPR - DELETE ACCOUNT
+// ============================================================
+async function deleteAccount() {
+ if (!currentUser) return;
+ const confirmed = confirm("Are you sure you want to delete your account and all data? This cannot be undone.");
+ if (!confirmed) return;
+ try {
+ await db.collection('saves').doc(currentUser.uid).delete();
+ await db.collection('leaderboard').doc(currentUser.uid).delete();
+ await currentUser.delete();
+ currentUser = null;
+ G = {};
+ notify("Account deleted.");
+ showScreen('auth');
+ } catch(e) {
+ if (e.code === 'auth/requires-recent-login') {
+ alert("For security, please sign out and sign back in before deleting your account.");
+ } else {
+ alert("Error: " + e.message);
+ }
+ }
+}
+
+// ============================================================
+// MORALE ACTIVITIES
+// ============================================================
+const MORALE_ACTIVITIES = {
+ pizza: { cost: 500, boost: 5, label: 'Pizza Party', emoji: 'PP' },
+ teamday: { cost: 2000, boost: 15, label: 'Team Day Out', emoji: 'TD' },
+ bonus: { cost: 5000, boost: 25, label: 'Pay Bonus', emoji: 'PB' },
+ retreat: { cost: 10000, boost: 40, label: 'Company Retreat', emoji: 'CR' }
+};
+
+function boostMorale(facilityIndex, activity, cost) {
+ const act = MORALE_ACTIVITIES[activity];
+ if (!act) return;
+ if (G.money < act.cost) {
+ notify('✗t enough money for ' + act.label + '. Need £' + act.cost.toLocaleString() + '.', true);
+ return;
+ }
+ const f = G.facilities[facilityIndex];
+ if (f.employees.length === 0) { notify('✗ employees in this facility.', true); return; }
+ G.money -= act.cost;
+ for (const e of f.employees) {
+ e.happiness = Math.min(100, e.happiness + act.boost);
+ e.productivity = e.skill * e.happiness / 100;
+ }
+ G.reputation = Math.min(100, G.reputation + Math.floor(act.boost / 10));
+ notify(act.emoji + ' ' + act.label + ' done! Morale +' + act.boost + '. Reputation +' + Math.floor(act.boost/10) + '.');
+ buildHireScreen();
+ updateMenu();
+}
+
+// ============================================================
+// SETTINGS SCREEN
+// ============================================================
+function buildSettingsScreen() {
+  const div = document.getElementById('settings-content');
+  if (!div) return;
+  if (!window.G) window.G = {};
+  if (!G.settings) G.settings = { compactMode:false, largeText:false, lightMode:false, highContrast:false, accent:'', btnStyle:'Rounded' };
+  const s = G.settings;
+
+  let accountHTML = '';
+  if (currentUser) {
+    const name = currentUser.displayName || currentUser.email.split('@')[0];
+    accountHTML = '<div class="card" style="flex-direction:column;gap:10px;align-items:flex-start;">'
+      + '<div style="font-size:14px;color:#fff;">Signed in as <strong>' + name + '</strong></div>'
+      + '<div style="color:#5d5;font-size:13px;">Progress is saving automatically.</div>'
+      + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">'
+      + '<button class="btn btn-grey" onclick="signOut()">Sign Out</button>'
+      + '<button class="btn btn-red" style="background:#4a0a0a;" onclick="deleteAccount()">Delete Account</button>'
+      + '</div></div>';
+  } else {
+    accountHTML = '<div class="card" style="flex-direction:column;gap:10px;align-items:flex-start;">'
+      + '<p style="color:#f77;font-size:14px;">Not signed in — progress won\'t save.</p>'
+      + '<div class="auth-tabs" style="width:100%;margin-bottom:4px;">'
+      + '<div class="auth-tab active" onclick="settingsAuthTab(\'login\',this)">Login</div>'
+      + '<div class="auth-tab" onclick="settingsAuthTab(\'register\',this)">Create Account</div>'
+      + '</div>'
+      + '<button class="google-btn" onclick="signInGoogle()" style="width:100%;">'
+      + '<svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.2l6.8-6.8C35.8 2.5 30.2 0 24 0 14.7 0 6.7 5.4 2.7 13.3l7.9 6.1C12.5 13.2 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 6.9-10 6.9-17z"/><path fill="#FBBC05" d="M10.6 28.6A14.8 14.8 0 0 1 9.5 24c0-1.6.3-3.2.8-4.6l-7.9-6.1A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.7 10.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.2-7.7 2.2-6.2 0-11.5-4.2-13.4-9.9l-7.9 6.1C6.7 42.6 14.7 48 24 48z"/></svg>'
+      + 'Continue with Google</button>'
+      + '<input type="text" id="settings-email" placeholder="Email address">'
+      + '<input type="password" id="settings-password" placeholder="Password">'
+      + '<div id="settings-name-wrap" style="display:none;">'
+      + '<input type="text" id="settings-displayname" placeholder="Display name (leaderboard)"></div>'
+      + '<div id="settings-error" class="error"></div>'
+      + '<button class="btn btn-green btn-full" id="settings-submit-btn" onclick="submitSettingsAuth()">Login</button>'
+      + '</div>';
+  }
+
+  const colours = ['#2c5ea8','#1a9050','#9a3000','#6030a0','#b8860b','#c0304a'];
+  let colourBtns = '';
+  for (let i = 0; i < colours.length; i++) {
+    const c = colours[i];
+    const border = s.accent === c ? '3px solid #fff' : '2px solid transparent';
+    colourBtns += '<button onclick="setAccent(\'' + c + '\')" style="width:32px;height:32px;border-radius:50%;background:' + c + ';border:' + border + ';cursor:pointer;"></button>';
+  }
+
+  const styles = ['Rounded','Sharp','Pill'];
+  let styleBtns = '';
+  for (let i = 0; i < styles.length; i++) {
+    const st = styles[i];
+    const cls = s.btnStyle === st ? 'btn-green' : 'btn-grey';
+    styleBtns += '<button class="btn ' + cls + '" onclick="setBtnStyle(\'' + st + '\')" style="font-size:13px;padding:6px 14px;">' + st + '</button>';
+  }
+
+  function row(label, desc, key) {
+    return '<div style="display:flex;justify-content:space-between;align-items:center;width:100%;">'
+      + '<div><div style="font-size:14px;color:#fff;">' + label + '</div>'
+      + '<div style="font-size:12px;color:#888;">' + desc + '</div></div>'
+      + '<button class="btn ' + (s[key] ? 'btn-green' : 'btn-grey') + '" onclick="toggleSetting(\'' + key + '\')" style="min-width:70px;">'
+      + (s[key] ? 'On' : 'Off') + '</button></div>';
+  }
+
+  div.innerHTML = '<h3 style="color:#aaa;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Account</h3>'
+    + accountHTML
+    + '<h3 style="color:#aaa;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;margin:20px 0 10px;">Interface</h3>'
+    + '<div class="card" style="flex-direction:column;gap:16px;align-items:flex-start;">'
+    + row('Compact Mode', 'Reduce padding and card size', 'compactMode')
+    + row('Large Text', 'Bigger font throughout', 'largeText')
+    + row('Light Mode', 'Switch to a light colour scheme', 'lightMode')
+    + row('High Contrast', 'Stronger colours for readability', 'highContrast')
+    + '<div style="width:100%;"><div style="font-size:14px;color:#fff;margin-bottom:6px;">Accent Colour</div>'
+    + '<div style="font-size:12px;color:#888;margin-bottom:10px;">Changes button and highlight colours</div>'
+    + '<div style="display:flex;gap:10px;flex-wrap:wrap;">' + colourBtns + '</div></div>'
+    + '<div style="width:100%;"><div style="font-size:14px;color:#fff;margin-bottom:8px;">Button Style</div>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap;">' + styleBtns + '</div></div>'
+    + '</div>';
+}
+
+function settingsAuthTab(mode, el) {
+  authMode = mode;
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('settings-submit-btn').textContent = mode === 'login' ? 'Login' : 'Create Account';
+  document.getElementById('settings-name-wrap').style.display = mode === 'register' ? 'block' : 'none';
+  document.getElementById('settings-error').textContent = '';
+}
+
+function submitSettingsAuth() {
+  const email    = document.getElementById('settings-email').value.trim();
+  const password = document.getElementById('settings-password').value;
+  const errEl    = document.getElementById('settings-error');
+  if (!email || !password) { errEl.textContent = 'Please fill in all fields.'; return; }
+  if (authMode === 'login') {
+    auth.signInWithEmailAndPassword(email, password)
+      .catch(e => { errEl.textContent = 'Login failed: ' + e.message; });
+  } else {
+    const displayName = document.getElementById('settings-displayname').value.trim() || email.split('@')[0];
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(cred => cred.user.updateProfile({ displayName }))
+      .catch(e => { errEl.textContent = 'Registration failed: ' + e.message; });
+  }
+}
+
+function buildInterfaceSettings() {
+  if (!G.settings) G.settings = { compactMode:false, largeText:false, lightMode:false, highContrast:false, accent:'', btnStyle:'Rounded' };
+  return `
+    <h3 style="color:#aaa;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;margin:16px 0 10px;">Interface</h3>
+    <div class="card" style="flex-direction:column;gap:12px;align-items:flex-start;">
+      <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+        <div>
+          <div style="font-size:14px;color:#fff;">Compact Mode</div>
+          <div style="font-size:12px;color:#888;">Smaller cards and text</div>
+        </div>
+        <button class="btn ${G.settings.compactMode ? 'btn-green' : 'btn-grey'}"
+          onclick="toggleSetting('compactMode')" style="min-width:70px;">
+          ${G.settings.compactMode ? 'On' : 'Off'}
+        </button>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+        <div>
+          <div style="font-size:14px;color:#fff;">Large Text</div>
+          <div style="font-size:12px;color:#888;">Increase font size throughout</div>
+        </div>
+        <button class="btn ${G.settings.largeText ? 'btn-green' : 'btn-grey'}"
+          onclick="toggleSetting('largeText')" style="min-width:70px;">
+          ${G.settings.largeText ? 'On' : 'Off'}
+        </button>
+      </div>
+    </div>`;
+}
+
+function toggleSetting(key) {
+  if (!G) window.G = {};
+  if (!G.settings) G.settings = { compactMode:false, largeText:false, lightMode:false, highContrast:false, accent:'', btnStyle:'Rounded' };
+  G.settings[key] = !G.settings[key];
+  applySettings();
+  buildSettingsScreen();
+}
+
+function applySettings() {
+  if (!G || !G.settings) return;
+  const s = G.settings;
+  const root = document.documentElement;
+  const body = document.body;
+
+  // Font size
+  if (s.largeText)      body.style.fontSize = '17px';
+  else if (s.compactMode) body.style.fontSize = '13px';
+  else                  body.style.fontSize = '';
+
+  // Compact mode - reduce padding on cards and screens
+  const style = document.getElementById('settings-dynamic-style') || document.createElement('style');
+  style.id = 'settings-dynamic-style';
+  let css = '';
+
+  if (s.compactMode) {
+    css += '.card { padding: 8px 10px !important; margin-bottom: 6px !important; }';
+    css += '.screen { padding: 14px 12px !important; }';
+    css += '.menu-btn { padding: 10px 8px !important; font-size: 13px !important; }';
+    css += '.btn { padding: 7px 12px !important; }';
+  }
+
+  // Light mode
+  if (s.lightMode) {
+    css += 'body { background: #f0f0f5 !important; color: #111 !important; }';
+    css += '.screen, .card, .summary-box, .prod-row, .top-bar, .user-bar { background: #fff !important; border-color: #ddd !important; }';
+    css += 'h1, h2, h3 { color: #1a3a6a !important; }';
+    css += '.card-info, .stat-value { color: #111 !important; }';
+    css += '.menu-btn { background: #2c5ea8 !important; }';
+    css += '#notification { background: #e0ffe0 !important; border-color: #5d5 !important; color: #1a4a1a !important; }';
+  }
+
+  // High contrast
+  if (s.highContrast) {
+    css += '.card { border: 2px solid #fff !important; }';
+    css += '.btn { border: 2px solid rgba(255,255,255,0.4) !important; }';
+    css += '.stat-value { color: #fff !important; font-weight: bold !important; }';
+    css += 'h1 { color: #ffe066 !important; }';
+    css += 'h2 { color: #ffe066 !important; }';
+  }
+
+  // Accent colour
+  if (s.accent) {
+    css += '.btn-blue, .menu-btn { background: ' + s.accent + ' !important; }';
+    css += '.btn-green { background: ' + s.accent + ' !important; }';
+    css += 'h1, .stat-value.money { color: ' + s.accent + ' !important; }';
+    css += '.progress-bar { background: ' + s.accent + ' !important; }';
+  }
+
+  // Button style
+  if (s.btnStyle === 'Sharp') {
+    css += '.btn, .menu-btn, .bulk-btn, .type-btn, .google-btn { border-radius: 0 !important; }';
+    css += '.card, .summary-box, .top-bar { border-radius: 0 !important; }';
+  } else if (s.btnStyle === 'Pill') {
+    css += '.btn, .menu-btn, .bulk-btn, .type-btn { border-radius: 999px !important; }';
+  }
+
+  style.textContent = css;
+  if (!document.getElementById('settings-dynamic-style')) {
+    document.head.appendChild(style);
+  }
+}
+
+function setAccent(colour) {
+  if (!G.settings) G.settings = {};
+  G.settings.accent = colour;
+  applySettings();
+  buildSettingsScreen();
+}
+
+function setBtnStyle(style) {
+  if (!G.settings) G.settings = {};
+  G.settings.btnStyle = style;
+  applySettings();
+  buildSettingsScreen();
+}
+</script>
+
+
+<!-- AUTH SCREEN -->
+<div id="screen-auth" class="screen">
+ <div class="auth-box">
+ <h1>Company Architect</h1>
+ <p class="subtitle">Sign in to save progress and compete on the leaderboard</p>
+
+ <!-- Google -->
+ <button class="google-btn" onclick="signInGoogle()">
+ <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.2l6.8-6.8C35.8 2.5 30.2 0 24 0 14.7 0 6.7 5.4 2.7 13.3l7.9 6.1C12.5 13.2 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 6.9-10 6.9-17z"/><path fill="#FBBC05" d="M10.6 28.6A14.8 14.8 0 0 1 9.5 24c0-1.6.3-3.2.8-4.6l-7.9-6.1A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.7 10.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.2-7.7 2.2-6.2 0-11.5-4.2-13.4-9.9l-7.9 6.1C6.7 42.6 14.7 48 24 48z"/></svg>
+ Continue with Google
+ </button>
+
+ <!-- Divider -->
+ <div class="auth-divider">or sign in with email</div>
+
+ <!-- Login / Register tabs -->
+ <div class="auth-tabs">
+ <div class="auth-tab active" onclick="authTab('login',this)">Login</div>
+ <div class="auth-tab" onclick="authTab('register',this)">Create Account</div>
+ </div>
+
+ <!-- Email form -->
+ <input type="text" id="auth-email" placeholder="Email address">
+ <input type="password" id="auth-password" placeholder="Password">
+ <div id="auth-name-wrap" style="display:none;">
+ <input type="text" id="auth-displayname" placeholder="Display name (shown on leaderboard)">
+ </div>
+ <div id="auth-error" class="error"></div>
+ <button class="btn btn-green btn-full" id="auth-submit-btn" onclick="submitAuth()">Login</button>
+
+ <!-- Guest -->
+ <div class="auth-divider" style="margin-top:20px;">or</div>
+ <button class="btn btn-grey btn-full" onclick="playAsGuest()">Play as Guest (no save)</button>
+ </div>
+</div>
+
+<!-- LEADERBOARD SCREEN -->
+<div id="screen-leaderboard" class="screen">
+ <h2>🏆 Leaderboard</h2>
+ <div id="leaderboard-content"><p style="color:#888;">Loading...</p></div>
+ <button class="btn btn-grey btn-full" onclick="goToMenu()">← Back</button>
+</div>
+
+
+<!-- TIPS SCREEN -->
+<div id="screen-tips" class="screen">
+ <h2>💡 Tips</h2>
+ <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;">
+ <div class="card"><div class="card-info"> <strong>Buy facilities early</strong> — no employees means no sales capacity and no revenue.</div></div>
+ <div class="card"><div class="card-info"> <strong>Hire before you end a turn</strong> — employees drive your sales capacity every turn.</div></div>
+ <div class="card"><div class="card-info"> <strong>Launch products straight away</strong> — you earn nothing until a product is live.</div></div>
+ <div class="card"><div class="card-info"> <strong>Price close to the market price</strong> — going too high kills demand even with high popularity.</div></div>
+ <div class="card"><div class="card-info"> <strong>Invest early</strong> — investments run for multiple turns and compound over time.</div></div>
+ <div class="card"><div class="card-info"> <strong>R&D is permanent</strong> — Supply Chain Deal and Automation Systems give the best long-term value.</div></div>
+ <div class="card"><div class="card-info"> <strong>Prestige when you hit £1M</strong> — your starting money multiplier stacks every time.</div></div>
+ <div class="card"><div class="card-info"> <strong>Seasons affect sales</strong> — Food booms in Summer, Clothing in Winter. Plan your production.</div></div>
+ <div class="card"><div class="card-info"> <strong>Loans are useful early</strong> — take a small loan to buy your second facility faster.</div></div>
+ <div class="card"><div class="card-info"> <strong>Products age</strong> — popularity slowly drops after a few turns. Launch new ones to keep revenue up.</div></div>
+ <div class="card"><div class="card-info"> <strong>Reputation matters</strong> — keep it above 60 for a sales boost. It drops when you fire staff.</div></div>
+ <div class="card"><div class="card-info"> <strong>Food tip</strong> — price your items at 2.5x production cost for the best balance of margin and demand.</div></div>
+ </div>
+ <button class="btn btn-grey btn-full" onclick="goToMenu()">← Back</button>
+</div>
+
+
+<!-- TUTORIAL SCREEN -->
+<div id="screen-tutorial" class="screen">
+ <h2>📖 How to Play</h2>
+ <div id="tutorial-content"></div>
+</div>
+
+
+<!-- HISTORY SCREEN -->
+<div id="screen-history" class="screen">
+ <h2>📊 Financial History</h2>
+ <div id="history-content"></div>
+ <button class="btn btn-grey btn-full" onclick="goToMenu()">← Back</button>
+</div>
+
+
+
+<!-- SETTINGS SCREEN -->
+<div id="screen-settings" class="screen">
+  <h2>⚙ Settings</h2>
+  <div id="settings-content"></div>
+  <button class="btn btn-grey btn-full" style="margin-top:12px;" onclick="G && G.businessType ? goToMenu() : showScreen('start')">← Back</button>
+</div>
+
+</body>
+</html>
